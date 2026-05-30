@@ -22,6 +22,8 @@ Designed with a clean, decoupled design pattern (central event-bus and state-mac
 
 ---
 
+<a id="key-features"></a>
+
 ## 🌟 Key Features
 
 *   **🔒 Biometric Face Authentication Gate**: Secure local user validation using YuNet and SFace models, featuring an autostart bypass flag (`--bypass-auth`) tailored for active development.
@@ -33,6 +35,8 @@ Designed with a clean, decoupled design pattern (central event-bus and state-mac
 *   **📊 Clean State Machine & Events**: Robust state transitions (`LOCKED` ➔ `IDLE` ➔ `LISTENING` ➔ `THINKING` ➔ `SPEAKING`) managed via a centralized Event Bus.
 
 ---
+
+<a id="system-architecture"></a>
 
 ## 📐 System Architecture
 
@@ -73,6 +77,8 @@ graph TD
 
 ---
 
+<a id="technology-stack"></a>
+
 ## 🛠️ Technology Stack
 
 | Layer | Component / Library | Details |
@@ -86,6 +92,8 @@ graph TD
 | **Storage** | SQLite / SQLModel | Local user database and conversational memory logging |
 
 ---
+
+<a id="installation"></a>
 
 ## ⚙️ Installation
 
@@ -127,6 +135,8 @@ graph TD
 
 ---
 
+<a id="usage-instructions"></a>
+
 ## 🚀 Usage Instructions
 
 To launch the assistant normally:
@@ -144,6 +154,8 @@ python app.py --bypass-auth
 This flag automatically launches the UI console, bypasses camera scans, and logs in the session as `"Omm"`.
 
 ---
+
+<a id="project-structure"></a>
 
 ## 📂 Project Structure
 
@@ -184,6 +196,8 @@ AURA/
 ```
 
 ---
+
+<a id="example-voice-commands"></a>
 
 ## 💬 Example Voice Commands
 
