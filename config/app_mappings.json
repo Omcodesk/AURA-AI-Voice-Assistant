@@ -1,0 +1,10 @@
+{
+    "chrome": "chrome",
+    "msedge": "msedge",
+    "notepad": "notepad.exe",
+    "calculator": "calc.exe",
+    "cmd": "cmd.exe",
+    "explorer": "explorer.exe",
+    "task manager": "taskmgr.exe",
+    "spotify": "spotify:"
+}

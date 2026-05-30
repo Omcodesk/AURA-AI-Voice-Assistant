@@ -1,0 +1,315 @@
+/* ── AURA Dark Theme QSS ───────────────────────────────────────────────── */
+
+/* ── Fonts (loaded via QFontDatabase in Python) ─────────────────────────── */
+* {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    color: #E8F4FE;
+    selection-background-color: #00D4FF44;
+    selection-color: #E8F4FE;
+}
+
+/* ── Root window ─────────────────────────────────────────────────────────── */
+QMainWindow, QWidget#root {
+    background-color: #070B14;
+}
+
+QWidget {
+    background-color: transparent;
+}
+
+/* ── Stacked root panel ──────────────────────────────────────────────────── */
+QWidget#screen_panel {
+    background-color: #070B14;
+}
+
+/* ── Top navigation bar ──────────────────────────────────────────────────── */
+QWidget#top_bar {
+    background-color: #0A0F1E;
+    border-bottom: 1px solid #0D2040;
+    min-height: 52px;
+    max-height: 52px;
+}
+
+QLabel#brand_label {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: #00D4FF;
+}
+
+QLabel#version_label {
+    font-size: 11px;
+    color: #3D5A7A;
+    letter-spacing: 2px;
+}
+
+/* ── Nav icon buttons ────────────────────────────────────────────────────── */
+QPushButton#nav_btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #7B9DB5;
+    min-width: 90px;
+}
+QPushButton#nav_btn:hover {
+    background-color: #0D2040;
+    border-color: #00D4FF33;
+    color: #E8F4FE;
+}
+QPushButton#nav_btn:checked {
+    background-color: #00D4FF18;
+    border-color: #00D4FF66;
+    color: #00D4FF;
+}
+
+/* ── Status state label (IDLE / LISTENING / THINKING …) ─────────────────── */
+QLabel#state_label {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: #00D4FF;
+}
+
+QLabel#state_label[state="IDLE"] { color: #4488AA; }
+QLabel#state_label[state="LISTENING"] { color: #00D4FF; }
+QLabel#state_label[state="THINKING"] { color: #7B5FFF; }
+QLabel#state_label[state="EXECUTING"] { color: #FF9900; }
+QLabel#state_label[state="SPEAKING"] { color: #00FF88; }
+QLabel#state_label[state="LOCKED"] { color: #FF3355; }
+QLabel#state_label[state="ERROR"] { color: #FF3355; }
+
+/* ── Transcript panel container ──────────────────────────────────────────── */
+QScrollArea#transcript_scroll {
+    background-color: transparent;
+    border: none;
+}
+QScrollArea#transcript_scroll > QWidget > QWidget {
+    background-color: transparent;
+}
+
+/* ── Transcript cards ────────────────────────────────────────────────────── */
+QFrame#user_card {
+    background-color: #0D1928;
+    border: 1px solid #0D2A44;
+    border-left: 3px solid #0066CC;
+    border-radius: 10px;
+    padding: 4px;
+}
+
+QFrame#aura_card {
+    background-color: #091420;
+    border: 1px solid #0A2230;
+    border-left: 3px solid #00D4FF;
+    border-radius: 10px;
+    padding: 4px;
+}
+
+QLabel#card_who {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #3D5A7A;
+}
+QLabel#card_who[role="user"] { color: #4477CC; }
+QLabel#card_who[role="aura"] { color: #00A0C8; }
+
+QLabel#card_text {
+    font-size: 14px;
+    color: #C8E0F0;
+    line-height: 1.5;
+}
+
+/* ── Activity card ───────────────────────────────────────────────────────── */
+QFrame#activity_card {
+    background-color: #0A1520;
+    border: 1px solid #0D2840;
+    border-radius: 10px;
+}
+
+QLabel#activity_title {
+    font-size: 11px;
+    color: #3D5A7A;
+    letter-spacing: 2px;
+}
+
+QLabel#activity_text {
+    font-size: 13px;
+    color: #88C0D8;
+}
+
+/* ── Status/indicator bar ────────────────────────────────────────────────── */
+QWidget#status_bar_widget {
+    background-color: #070D18;
+    border-top: 1px solid #0A1E30;
+    min-height: 36px;
+    max-height: 36px;
+}
+
+QLabel#indicator_label {
+    font-size: 11px;
+    color: #3D5A7A;
+}
+QLabel#indicator_label[active="true"] { color: #00D4FF; }
+QLabel#indicator_label[active="false"] { color: #3D5A7A; }
+
+/* ── Auth screen ─────────────────────────────────────────────────────────── */
+QWidget#auth_panel {
+    background-color: #070B14;
+}
+
+QLabel#auth_title {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: 10px;
+    color: #00D4FF;
+}
+
+QLabel#auth_subtitle {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: #3D5A7A;
+}
+
+QLabel#auth_status {
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #7B9DB5;
+}
+
+QPushButton#auth_btn {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #004488, stop:1 #006699);
+    border: 1px solid #00D4FF44;
+    border-radius: 30px;
+    color: #E8F4FE;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    min-width: 260px;
+    padding: 14px 36px;
+}
+QPushButton#auth_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #0055AA, stop:1 #0099CC);
+    border-color: #00D4FFAA;
+}
+QPushButton#auth_btn:pressed {
+    background: #003366;
+}
+
+QPushButton#auth_btn_save {
+    background: #008855;
+    border: 1px solid #00FF8844;
+    border-radius: 20px;
+    color: #E8F4FE;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 24px;
+}
+QPushButton#auth_btn_save:hover {
+    background: #00AA66;
+    border-color: #00FF88AA;
+}
+
+QPushButton#auth_btn_retry {
+    background: #2A3A4A;
+    border: 1px solid #3D5A7A44;
+    border-radius: 20px;
+    color: #E8F4FE;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 24px;
+}
+QPushButton#auth_btn_retry:hover {
+    background: #3D5A7A;
+    border-color: #3D5A7AAA;
+}
+
+/* ── Admin / Settings screen ─────────────────────────────────────────────── */
+QLabel#section_title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: #3D5A7A;
+    border-bottom: 1px solid #0D2040;
+    padding-bottom: 6px;
+}
+
+QLineEdit {
+    background-color: #0D1928;
+    border: 1px solid #0D2840;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #E8F4FE;
+}
+QLineEdit:focus {
+    border-color: #00D4FF66;
+}
+
+QComboBox {
+    background-color: #0D1928;
+    border: 1px solid #0D2840;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #E8F4FE;
+    min-width: 140px;
+}
+QComboBox::drop-down { border: none; }
+QComboBox QAbstractItemView {
+    background-color: #0D1928;
+    border: 1px solid #00D4FF33;
+    selection-background-color: #00D4FF22;
+}
+
+QPushButton#action_btn {
+    background-color: #0D2040;
+    border: 1px solid #00D4FF33;
+    border-radius: 8px;
+    color: #00D4FF;
+    font-size: 13px;
+    padding: 8px 20px;
+}
+QPushButton#action_btn:hover {
+    background-color: #00D4FF18;
+    border-color: #00D4FF88;
+}
+QPushButton#danger_btn {
+    background-color: #200A10;
+    border: 1px solid #FF335544;
+    border-radius: 8px;
+    color: #FF3355;
+    font-size: 13px;
+    padding: 8px 20px;
+}
+QPushButton#danger_btn:hover {
+    background-color: #FF335518;
+    border-color: #FF3355AA;
+}
+
+/* ── Scrollbars ──────────────────────────────────────────────────────────── */
+QScrollBar:vertical {
+    background: #0A0F1E;
+    width: 6px;
+    border-radius: 3px;
+}
+QScrollBar::handle:vertical {
+    background: #0D2840;
+    border-radius: 3px;
+    min-height: 30px;
+}
+QScrollBar::handle:vertical:hover { background: #00D4FF44; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
+
+/* ── Misc ────────────────────────────────────────────────────────────────── */
+QToolTip {
+    background-color: #0D1928;
+    border: 1px solid #00D4FF44;
+    color: #E8F4FE;
+    padding: 4px 8px;
+    font-size: 12px;
+}

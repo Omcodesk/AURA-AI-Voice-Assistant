@@ -1,0 +1,47 @@
+{
+    "apps": {
+        "browser": "msedge",
+        "internet": "msedge",
+        "internet explorer": "msedge",
+        "web browser": "msedge",
+        "chrome": "chrome",
+        "google chrome": "chrome",
+        "chrome browser": "chrome",
+        "the chrome": "chrome",
+        "edge": "msedge",
+        "microsoft edge": "msedge",
+        "spotify": "spotify",
+        "music": "spotify",
+        "notepad": "notepad",
+        "text editor": "notepad",
+        "calculator": "calculator",
+        "math": "calculator",
+        "cmd": "cmd",
+        "terminal": "cmd",
+        "explorer": "explorer",
+        "files": "explorer",
+        "task manager": "task manager"
+    },
+    "sites": {
+        "youtube": "https://www.youtube.com",
+        "google": "https://www.google.com",
+        "search": "https://www.google.com",
+        "gmail": "https://mail.google.com",
+        "email": "https://mail.google.com",
+        "github": "https://github.com",
+        "whatsapp": "https://web.whatsapp.com",
+        "facebook": "https://www.facebook.com",
+        "twitter": "https://www.twitter.com",
+        "reddit": "https://www.reddit.com"
+    },
+    "verbs": {
+        "opne": "open",
+        "strt": "start",
+        "launsh": "launch",
+        "serch": "search",
+        "luk up": "look up",
+        "go": "open",
+        "jump": "open",
+        "navigate": "open"
+    }
+}

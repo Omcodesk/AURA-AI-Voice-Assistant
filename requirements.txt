@@ -1,0 +1,61 @@
+# ── JARVIS V2 Requirements ──────────────────────────────────────────────────
+# Install: pip install -r requirements.txt
+# Python: 3.11+
+
+# GUI
+PySide6>=6.6.0
+
+# Audio capture
+sounddevice>=0.4.6
+numpy>=1.24.0
+
+# VAD
+webrtcvad-wheels>=2.0.14          # pre-built wheels for Windows
+
+# STT — Groq Whisper API (also used for wake phrase detection)
+groq>=0.9.0
+
+# TTS — local Windows SAPI (immediate; Piper upgrade path via config)
+pyttsx3>=2.90
+
+# LLM — Ollama local
+ollama>=0.2.0
+
+# Face Auth (Phase 2)
+opencv-python>=4.8.0
+# insightface>=0.7.3            # uncomment for Phase 2
+# onnxruntime>=1.16.0           # uncomment for Phase 2
+
+# UI Automation (Phase 3-4)
+pyautogui>=0.9.54
+pynput>=1.7.6
+pygetwindow>=0.0.9
+pywinauto>=0.6.8
+
+# Browser automation (Phase 3)
+playwright>=1.40.0
+
+# System control
+psutil>=5.9.0
+pycaw>=20230407
+screen-brightness-control>=0.23.0
+
+# Screenshots
+mss>=9.0.1
+Pillow>=10.0.0
+
+# Scheduling (Phase 3)
+APScheduler>=3.10.0
+
+# Database / ORM
+sqlmodel>=0.0.14
+
+# Config + env
+PyYAML>=6.0
+python-dotenv>=1.0.0
+
+# HTTP (weather / news)
+httpx>=0.25.0
+
+# Logging
+loguru>=0.7.2

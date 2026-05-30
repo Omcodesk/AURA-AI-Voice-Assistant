@@ -1,0 +1,46 @@
+auth:
+  enabled: false           # Phase 1: bypassed. Set true in Phase 2.
+  liveness_challenge: "blink"   # blink | head_turn | both
+  max_attempts: 3
+  lockout_minutes: 5
+  auto_lock_timeout_minutes: 10
+
+face:
+  embedding_distance_threshold: 0.6
+  min_detection_confidence: 0.8
+  frames_for_enrollment: 20
+
+risk_tiers:
+  tier0:
+    - search
+    - open_app
+    - screenshot
+    - weather
+    - time
+    - news
+    - media_play
+    - media_pause
+    - volume
+    - brightness
+  tier1:
+    - close_app
+    - change_settings
+    - media_next
+    - open_folder
+  tier2:
+    - send_message
+    - draft_email
+    - upload
+    - submit_form
+    - download
+    - login
+  tier3:
+    - delete
+    - shutdown
+    - restart
+    - overwrite
+    - security_change
+
+confirmation_phrases:
+  yes: ["yes", "confirm", "do it", "go ahead", "proceed", "correct", "affirmative"]
+  no: ["no", "cancel", "abort", "stop", "don't", "negative", "nope"]

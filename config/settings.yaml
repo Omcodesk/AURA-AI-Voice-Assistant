@@ -1,0 +1,65 @@
+aura:
+  name: "AURA"
+  version: "1.0.0-phase4"
+
+audio:
+  sample_rate: 16000
+  channels: 1
+  chunk_size: 480          # 30 ms at 16 kHz (WebRTC VAD requirement)
+  device_index: null       # null = system default microphone
+
+wake:
+  phrase: "take control"
+  # Detection uses Groq Whisper — no separate model needed
+
+vad:
+  aggressiveness: 2        # 0–3; higher = more aggressive noise rejection
+  silence_frames: 20       # consecutive silent 30 ms frames to end capture (~600 ms)
+  min_speech_frames: 10    # minimum frames to consider valid speech (~300 ms)
+  pre_speech_pad_frames: 5 # frames to prepend before detected speech start
+
+stt:
+  provider: "groq"
+  model: "whisper-large-v3-turbo"
+  language: "en"
+
+tts:
+  engine: "pyttsx3"        # pyttsx3 | piper
+  rate: 175
+  volume: 0.95
+  # Piper config (used only when engine=piper)
+  piper:
+    binary: "models/piper/piper.exe"
+    model: "models/piper/en_US-ryan-high.onnx"
+
+llm:
+  provider: "groq"                 # groq (fastest) | ollama (offline)
+  model: "llama-3.1-8b-instant"    # groq: llama-3.1-8b-instant | llama3-70b-8192 | gemma2-9b-it
+                                   # ollama: llama3.2:1b | llama3.2:3b | phi3:mini
+  timeout: 15
+  max_history_turns: 10
+
+session:
+  active_window_timeout: 300   # seconds of silence before returning to idle
+  auto_lock_minutes: 10       # minutes of inactivity before re-auth required
+
+screenshot:
+  save_directory: "data/screenshots"
+  format: "png"
+
+memory:
+  database_path: "data/memory/aura.db"
+
+logging:
+  level: "INFO"
+  directory: "data/logs"
+  max_size_mb: 10
+  retention_days: 7
+
+browser:
+  preferred: "edge"       # chrome | edge
+  whatsapp_web: true
+
+camera:
+  device_index: 0
+  backend: "default"        # default | dshow | msmf

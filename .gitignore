@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Local configuration and API keys
+.env
+
+# SQLite databases, logs, biometric faces, and browser profile caches
+*.db
+data/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
