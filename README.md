@@ -7,11 +7,11 @@
 <p align="center">
   <a href="#key-features"><b>Features</b></a> •
   <a href="#system-architecture"><b>Architecture</b></a> •
-  <a href="#tech-stack"><b>Tech Stack</b></a> •
+  <a href="#technology-stack"><b>Tech Stack</b></a> •
   <a href="#installation"><b>Installation</b></a> •
-  <a href="#usage"><b>Usage</b></a> •
+  <a href="#usage-instructions"><b>Usage</b></a> •
   <a href="#project-structure"><b>Structure</b></a> •
-  <a href="#example-commands"><b>Voice Commands</b></a>
+  <a href="#example-voice-commands"><b>Voice Commands</b></a>
 </p>
 
 ---
