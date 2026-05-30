@@ -18,7 +18,7 @@ If you discover a security vulnerability in AURA — especially related to:
 **Please do NOT open a public GitHub issue.**
 
 Instead, report it privately by emailing:
-📧 **omchaddha7@gmail.com**
+📧 **ommm4793@gmail.com**
 
 Include:
 - A clear description of the vulnerability
