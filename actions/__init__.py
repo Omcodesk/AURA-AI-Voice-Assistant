@@ -16,5 +16,7 @@ import actions.whatsapp
 import actions.email_web
 import actions.vision_control
 import actions.computer_control
+import actions.file_editor
+import actions.terminal_control
 
 __all__ = ["conversation"]

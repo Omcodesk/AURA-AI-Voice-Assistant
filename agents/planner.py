@@ -55,6 +55,7 @@ Available Tools (Intents):
 - vision (action: describe_screen) [slots: query]
 - time (action: get_time)
 - weather (action: get_weather)
+- developer (action: read_file, write_file, patch_file, list_directory, run_command, approve_command) [slots: filepath, content, search_block, replace_block, dirpath, command]
 - computer (action: click_element, type_into_element, focus_window, close_window, press_shortcut) [slots: name, text, keys]
 - conversation (action: chat) [slots: text]
 
