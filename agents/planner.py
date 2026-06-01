@@ -139,6 +139,14 @@ Output Format:
                     from services.action_dispatcher import dispatcher
                     result = dispatcher.dispatch(cmd)
                     
+                    # Deterministic Verification for Developer Agent
+                    if intent == "developer" and action == "run_command" and isinstance(result.data, dict):
+                        if result.data.get("exit_code") == 0 and result.data.get("tests_passed") is True:
+                            logger.info("Deterministic verification passed. Terminating debugging loop.")
+                            final_message = "All tests passed successfully. The debugging loop is complete."
+                            bus.publish(AgentEventTypes.PLAN_COMPLETED, {"message": final_message})
+                            break
+                    
                     # Emit Result Event
                     bus.publish(AgentEventTypes.RESULT, AgentResultEvent(
                         agent_name="Planner",

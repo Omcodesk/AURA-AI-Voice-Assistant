@@ -83,7 +83,22 @@ def run_command(cmd: ParsedCommand) -> ExecutionResult:
         if not output:
             output = "[Command executed successfully with no output]"
             
-        return ExecutionResult(success=result.returncode == 0, message=output)
+        # Deterministic verification flags
+        tests_passed = False
+        if result.returncode == 0 and ("test" in command.lower() or "pytest" in command.lower()):
+            tests_passed = True
+            
+        data_payload = {
+            "exit_code": result.returncode,
+            "tests_passed": tests_passed,
+            "stdout": stdout,
+            "stderr": stderr
+        }
+        
+        import json
+        structured_msg = f"{output}\n\n[STRUCTURED RESULT]:\n{json.dumps(data_payload, indent=2)}"
+            
+        return ExecutionResult(success=result.returncode == 0, message=structured_msg, data=data_payload)
         
     except subprocess.TimeoutExpired:
         return ExecutionResult(success=False, message=f"Command timed out after {timeout} seconds.")
