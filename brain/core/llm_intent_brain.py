@@ -37,6 +37,7 @@ Available Intents:
 - email (action: draft_email)
 - time (action: get_time)
 - weather (action: get_weather)
+- vision (action: describe_screen)
 - conversation (action: chat)
 
 Output Format:
