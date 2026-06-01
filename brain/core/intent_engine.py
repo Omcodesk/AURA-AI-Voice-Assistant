@@ -20,7 +20,14 @@ class IntentEngine:
         logger.info("Processing intent: '{}' (normalized: '{}')", text, clean_text)
         
         # A. Try Fast Match (Deterministic - First & Fastest)
-        intent = matcher.match(clean_text)
+        # Skip fast matcher if sentence is complex, allowing LLM to handle STT errors and multi-actions
+        words = clean_text.split()
+        is_complex = len(words) > 5 or " and " in clean_text or " then " in clean_text
+        
+        intent = None
+        if not is_complex:
+            intent = matcher.match(clean_text)
+
         if intent:
             res = {
                 "intent": intent,
@@ -31,7 +38,7 @@ class IntentEngine:
                 "requires_confirmation": False
             }
         else:
-            # B. Try LLM Fallback (Reasoning - Second)
+            # B. Try LLM Brain (Reasoning)
             ctx = context_memory.get_last() or ""
             res = llm_brain.classify(clean_text, context=ctx)
             if not res:

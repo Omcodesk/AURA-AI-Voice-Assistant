@@ -25,6 +25,8 @@ You are the Intent Brain for AURA.
 Convert the user speech into a structured JSON command.
 Context: {context}
 
+IMPORTANT: The user input is from a Speech-to-Text (STT) engine. It may contain phonetic errors (e.g., "Such was" instead of "Search for", "on Google" for web search). Silently correct these STT errors based on context before extracting slots.
+
 Available Intents: 
 - app_control (action: open_app, close_app)
 - browser_control (action: open_website, search_web)
@@ -33,18 +35,20 @@ Available Intents:
 - screenshot (action: capture, open_latest)
 - whatsapp (action: send_message, open_chat)
 - email (action: draft_email)
+- time (action: get_time)
+- weather (action: get_weather)
 - conversation (action: chat)
 
 Output Format:
 {{
   "intent": "category",
   "action": "specific_action",
-  "slots": {{"app": "name", "site": "name", "query": "text", "target": "name", "message": "text"}},
+  "slots": {{"app": "name", "site": "name", "query": "corrected text to search", "target": "name", "message": "text"}},
   "confidence": 0.0-1.0,
   "needs_clarification": false,
   "clarification_question": "",
   "requires_confirmation": false,
-  "reason": "explanation"
+  "reason": "explanation of corrections and intent"
 }}
 """
         try:
