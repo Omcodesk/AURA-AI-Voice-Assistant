@@ -37,7 +37,7 @@ from PySide6.QtGui import QIcon
 from core.logger import setup_logger
 from core.config_loader import config
 from brain.memory_manager import memory
-
+import actions  # THIS IS CRITICAL: Loads and registers all action handlers in actions/__init__.py
 
 # Global socket reference to prevent garbage collection
 _lock_socket = None
