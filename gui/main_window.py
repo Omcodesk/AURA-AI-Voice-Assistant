@@ -19,6 +19,7 @@ from PySide6.QtGui import QFont, QFontDatabase, QPalette, QColor
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QStackedWidget,
     QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
+    QSystemTrayIcon, QMenu, QStyle
 )
 from loguru import logger
 
@@ -92,6 +93,7 @@ class MainWindow(QMainWindow):
 
         self._load_theme()
         self._build_ui()
+        self._setup_tray_icon()
         self._wire_signals()
 
     # ── Theme & UI ────────────────────────────────────────────────────────────
@@ -186,6 +188,49 @@ class MainWindow(QMainWindow):
         btn.clicked.connect(lambda _, i=stack_idx: self._switch_screen(i))
         return btn
 
+    # ── System Tray ───────────────────────────────────────────────────────────
+
+    def _setup_tray_icon(self):
+        # Create tray icon
+        self._tray_icon = QSystemTrayIcon(self)
+        
+        # Use a standard Qt icon for the tray
+        icon = self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon)
+        self._tray_icon.setIcon(icon)
+        self._tray_icon.setToolTip("AURA - AI Voice Assistant")
+        
+        # Create context menu
+        tray_menu = QMenu(self)
+        
+        show_action = tray_menu.addAction("Show AURA")
+        show_action.triggered.connect(self._tray_show_requested)
+        
+        quit_action = tray_menu.addAction("Exit")
+        quit_action.triggered.connect(self.close)
+        
+        self._tray_icon.setContextMenu(tray_menu)
+        
+        # Show/hide on double click
+        self._tray_icon.activated.connect(self._on_tray_activated)
+        self._tray_icon.show()
+
+    def _tray_show_requested(self):
+        if self.isHidden():
+            if sm.is_(State.LOCKED):
+                self._start_face_auth()
+            else:
+                self.showNormal()
+                self.raise_()
+                self.activateWindow()
+        else:
+            self.showNormal()
+            self.raise_()
+            self.activateWindow()
+
+    def _on_tray_activated(self, reason):
+        if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
+            self._tray_show_requested()
+
     # ── Auth → console transition ─────────────────────────────────────────
 
     @Slot(str)
@@ -234,6 +279,10 @@ class MainWindow(QMainWindow):
         bus.subscribe(Events.STATE_CHANGED, lambda p: self._signals.state_changed.emit(p.get("to", "IDLE")))
         bus.subscribe(Events.SESSION_LOCKED, lambda _: self._on_locked())
         bus.subscribe(Events.AUTH_SUCCESS,   lambda p: logger.info("Event: AUTH_SUCCESS user={}", p.get("user")))
+        
+        # Phase 2: Agent Telemetry Wiring
+        bus.subscribe("agent.thought", lambda p: self._signals.activity_update.emit(f"[Planner] {p.get('thought', '')}"))
+        bus.subscribe("agent.action", lambda p: self._signals.activity_update.emit(f"Executing: {p.get('tool', '')}"))
 
     # ── Audio pipeline ────────────────────────────────────────────────────────
 
@@ -676,6 +725,8 @@ class MainWindow(QMainWindow):
         self._cancel_timers()
         self._signals.countdown_stop.emit()
         self.hide()   # Hide the UI to stay silent in background
+        if hasattr(self, '_tray_icon'):
+            self._tray_icon.showMessage("AURA", "AURA is running in the background. Say 'Take Control' to wake.", QSystemTrayIcon.MessageIcon.Information, 3000)
         if self._tts:
             self._tts.speak("Session locked due to inactivity.")
 

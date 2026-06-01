@@ -3,7 +3,7 @@ from brain.core.command_normalizer import normalizer
 from brain.core.context_memory import context_memory
 from brain.core.slot_extractor import slot_extractor
 from brain.core.fast_rule_matcher import matcher
-from brain.core.llm_intent_brain import llm_brain
+from agents.planner import planner
 from brain.core.multi_intent_parser import multi_parser
 from brain.core.confidence_guard import confidence_guard
 
@@ -38,11 +38,13 @@ class IntentEngine:
                 "requires_confirmation": False
             }
         else:
-            # B. Try LLM Brain (Reasoning)
+            # B. Delegate to God Mode Planner (Reasoning & Multi-Step)
             ctx = context_memory.get_last() or ""
-            res = llm_brain.classify(clean_text, context=ctx)
-            if not res:
-                # Final fallback to conversation
+            # The planner handles execution internally and returns the final conversation node
+            planner_result = planner.execute_goal(clean_text, context=ctx)
+            if planner_result:
+                res = planner_result[0]
+            else:
                 res = {
                     "intent": "conversation",
                     "action": "chat",
