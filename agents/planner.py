@@ -55,6 +55,7 @@ Available Tools (Intents):
 - vision (action: describe_screen) [slots: query]
 - time (action: get_time)
 - weather (action: get_weather)
+- memory (action: store_memory, recall_memory) [slots: category, text, query, project]
 - developer (action: read_file, write_file, patch_file, list_directory, run_command, approve_command) [slots: filepath, content, search_block, replace_block, dirpath, command]
 - computer (action: click_element, type_into_element, focus_window, close_window, press_shortcut) [slots: name, text, keys]
 - conversation (action: chat) [slots: text]
@@ -74,9 +75,14 @@ Output Format:
   "is_complete": false
 }}
 """
+        # Inject dynamic context
+        from services.memory.retrieval import retrieve_context
+        memory_context = retrieve_context(goal)
+        full_context = f"{context}\n{memory_context}".strip()
+        
         messages = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"Goal: {goal}"}
+            {"role": "user", "content": f"Context:\n{full_context}\n\nGoal: {goal}"}
         ]
 
         iteration = 0

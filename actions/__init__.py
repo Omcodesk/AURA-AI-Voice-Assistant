@@ -18,5 +18,6 @@ import actions.vision_control
 import actions.computer_control
 import actions.file_editor
 import actions.terminal_control
+import actions.memory_control
 
 __all__ = ["conversation"]
