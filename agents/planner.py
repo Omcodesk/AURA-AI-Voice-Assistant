@@ -12,10 +12,11 @@ from core.result_types import ParsedCommand, ExecutionResult
 from core.action_registry import registry
 # We will import the dispatcher in the implementation method to avoid circular imports.
 
-@registry.register("system", "echo")
 def planner_echo(cmd: ParsedCommand) -> ExecutionResult:
     """A dummy action used by the Planner to return its final message back to the GUI."""
     return ExecutionResult(success=True, message=cmd.slots.get("text", "Task completed."))
+
+registry.register("system", "echo", planner_echo)
 
 class PlannerAgent:
     MAX_ITERATIONS = 5
@@ -54,6 +55,7 @@ Available Tools (Intents):
 - vision (action: describe_screen) [slots: query]
 - time (action: get_time)
 - weather (action: get_weather)
+- computer (action: click_element, type_into_element, focus_window, close_window, press_shortcut) [slots: name, text, keys]
 - conversation (action: chat) [slots: text]
 
 You must output a STRICT JSON object on every turn.
@@ -128,10 +130,8 @@ Output Format:
                     cmd = ParsedCommand(
                         intent=intent,
                         action=action,
-                        slots=slots,
                         target=slots.get("app") or slots.get("site") or slots.get("target") or "",
-                        arguments=slots,
-                        confidence=1.0
+                        arguments=slots
                     )
                     
                     # Dispatch (Step 2.3 Bridge)

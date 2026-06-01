@@ -1,5 +1,5 @@
 """
-vision/vlm_client.py — Communicates with Groq Vision LLMs (e.g. Llama-3.2-11b-vision-preview).
+vision/vlm_client.py — Communicates with Groq Vision LLMs (e.g. Llama-3.2-90b-vision-preview).
 """
 
 from groq import Groq
@@ -11,7 +11,7 @@ class VisionClient:
     def __init__(self):
         self.client = None
         # Using Groq's multimodal Llama model
-        self.model = config.get("vision.model", "llama-3.2-11b-vision-preview")
+        self.model = config.get("vision.model", "llama-3.2-90b-vision-preview")
 
     def _init_client(self):
         if self.client is None:

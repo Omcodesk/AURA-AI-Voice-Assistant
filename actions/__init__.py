@@ -15,5 +15,6 @@ import actions.weather_service
 import actions.whatsapp
 import actions.email_web
 import actions.vision_control
+import actions.computer_control
 
 __all__ = ["conversation"]
