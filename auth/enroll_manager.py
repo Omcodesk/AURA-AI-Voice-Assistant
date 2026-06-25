@@ -2,6 +2,7 @@
 auth/enroll_manager.py — Guided face enrollment: capture N good frames → average embedding → store.
 Called from EnrollDialog (GUI) or admin screen.
 """
+
 from __future__ import annotations
 from typing import Callable
 import cv2
@@ -17,15 +18,15 @@ class EnrollManager:
     are collected, then stores the averaged embedding.
     """
 
-    TARGET_FRAMES  = 20    # number of good frames to capture
+    TARGET_FRAMES = 20  # number of good frames to capture
     MIN_CONFIDENCE = 0.80  # minimum detection score to accept a frame
-    MIN_BLUR       = 60.0  # lower is more blur; >60 is usually okay-ish, >100 is good
+    MIN_BLUR = 60.0  # lower is more blur; >60 is usually okay-ish, >100 is good
 
     def __init__(self):
         self._frames: list[np.ndarray] = []
         self._target_name: str = ""
         self._active: bool = False
-        
+
         # Quality feedback
         self.last_rejection: str = ""
         self.best_frame_bgr: np.ndarray | None = None
@@ -38,7 +39,9 @@ class EnrollManager:
         self._target_name = name.strip()
         self._frames = []
         self._active = True
-        logger.info("Enrollment started for '{}'  (need {} frames)", name, self.TARGET_FRAMES)
+        logger.info(
+            "Enrollment started for '{}'  (need {} frames)", name, self.TARGET_FRAMES
+        )
 
     def cancel(self) -> None:
         self._active = False
@@ -101,21 +104,23 @@ class EnrollManager:
     def _check_quality(self, frame: np.ndarray, face: dict) -> tuple[bool, str, dict]:
         """Verify face size, sharpness, and alignment."""
         # ── Sharpness ──
-        gray = face_analyzer.crop_face(frame, face) # I need to check if crop_face exists or use alignCrop
+        gray = face_analyzer.crop_face(
+            frame, face
+        )  # I need to check if crop_face exists or use alignCrop
         if gray is None:
-             # fallback to simple bbox crop
-             x, y, w, h = face["bbox"]
-             gray = cv2.cvtColor(frame[y:y+h, x:x+w], cv2.COLOR_BGR2GRAY)
+            # fallback to simple bbox crop
+            x, y, w, h = face["bbox"]
+            gray = cv2.cvtColor(frame[y : y + h, x : x + w], cv2.COLOR_BGR2GRAY)
         else:
-             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-             
+            gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+
         laplacian = cv2.Laplacian(gray, cv2.CV_64F).var()
-        
+
         # ── Size ──
         f_h, f_w = frame.shape[:2]
         w = face["bbox"][2]
         size_ratio = w / f_w
-        
+
         # ── Alignment (horizontal eyes) ──
         lmks = face["landmarks"]
         left_eye, right_eye = lmks[0], lmks[1]

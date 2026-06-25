@@ -16,7 +16,8 @@ from loguru import logger
 
 class _BusCore(QObject):
     """Internal Qt object that owns the signal."""
-    event_fired = Signal(str, object)   # event_type, payload dict
+
+    event_fired = Signal(str, object)  # event_type, payload dict
 
 
 class EventBus:
@@ -61,10 +62,13 @@ class EventBus:
             try:
                 cb(payload)
             except Exception as exc:
-                logger.exception("EventBus callback error for '{}': {}", event_type, exc)
+                logger.exception(
+                    "EventBus callback error for '{}': {}", event_type, exc
+                )
 
 
 # ── Event type constants ────────────────────────────────────────────────────
+
 
 class Events:
     # Auth
@@ -76,10 +80,10 @@ class Events:
     WAKE_DETECTED = "wake.detected"
     SPEECH_START = "speech.start"
     SPEECH_END = "speech.end"
-    AUDIO_CAPTURED = "audio.captured"        # payload: {"audio": bytes}
+    AUDIO_CAPTURED = "audio.captured"  # payload: {"audio": bytes}
 
     # Processing
-    TRANSCRIPT_READY = "transcript.ready"    # payload: {"text": str}
+    TRANSCRIPT_READY = "transcript.ready"  # payload: {"text": str}
     TRANSCRIPT_REJECTED = "transcript.rejected"
     INTENT_CLASSIFIED = "intent.classified"  # payload: {"intent": str, "args": dict}
     CONFIRMATION_REQUIRED = "confirmation.required"
@@ -90,12 +94,12 @@ class Events:
     ACTION_ERROR = "action.error"
 
     # Response
-    RESPONSE_READY = "response.ready"        # payload: {"text": str}
+    RESPONSE_READY = "response.ready"  # payload: {"text": str}
     TTS_START = "tts.start"
     TTS_END = "tts.end"
 
     # State
-    STATE_CHANGED = "state.changed"          # payload: {"from": str, "to": str}
+    STATE_CHANGED = "state.changed"  # payload: {"from": str, "to": str}
 
     # System
     ERROR = "system.error"

@@ -10,7 +10,8 @@ from PySide6.QtCore import QObject, Signal
 
 class LogBridge(QObject):
     """Qt signal bridge so GUI panels can subscribe to log messages."""
-    log_message = Signal(str, str)   # (level, message)
+
+    log_message = Signal(str, str)  # (level, message)
 
     def emit_log(self, level: str, message: str):
         self.log_message.emit(level, message)

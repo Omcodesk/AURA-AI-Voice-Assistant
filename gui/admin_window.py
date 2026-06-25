@@ -7,9 +7,16 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QComboBox, QPushButton,
-    QScrollArea, QFrame,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QComboBox,
+    QPushButton,
+    QScrollArea,
+    QFrame,
 )
 
 from core.config_loader import config
@@ -38,7 +45,9 @@ class AdminWindow(QWidget):
 
         # ── Header ─────────────────────────────────────────────────────────
         title = QLabel("SETTINGS  &  ADMIN")
-        title.setStyleSheet("font-size: 20px; font-weight: 700; letter-spacing: 4px; color: #00D4FF;")
+        title.setStyleSheet(
+            "font-size: 20px; font-weight: 700; letter-spacing: 4px; color: #00D4FF;"
+        )
         root.addWidget(title)
         root.addSpacing(8)
 
@@ -87,9 +96,15 @@ class AdminWindow(QWidget):
         grid4.addWidget(QLabel("Provider"), 0, 0)
         grid4.addWidget(QLineEdit(config.get("llm.provider", "groq").upper()), 0, 1)
         grid4.addWidget(QLabel("Model"), 1, 0)
-        grid4.addWidget(QLineEdit(config.get("llm.model", "llama-3.1-8b-instant")), 1, 1)
+        grid4.addWidget(
+            QLineEdit(config.get("llm.model", "llama-3.1-8b-instant")), 1, 1
+        )
         grid4.addWidget(QLabel("Host"), 2, 0)
-        host_val = config.ollama_host() if config.get("llm.provider") == "ollama" else "api.groq.com"
+        host_val = (
+            config.ollama_host()
+            if config.get("llm.provider") == "ollama"
+            else "api.groq.com"
+        )
         grid4.addWidget(QLineEdit(host_val), 2, 1)
         root.addLayout(grid4)
         root.addSpacing(8)
@@ -99,9 +114,13 @@ class AdminWindow(QWidget):
         grid5 = QGridLayout()
         grid5.setSpacing(10)
         grid5.addWidget(QLabel("Active window (s)"), 0, 0)
-        grid5.addWidget(QLineEdit(str(config.get("session.active_window_timeout", 300))), 0, 1)
+        grid5.addWidget(
+            QLineEdit(str(config.get("session.active_window_timeout", 300))), 0, 1
+        )
         grid5.addWidget(QLabel("Auto-lock (min)"), 1, 0)
-        grid5.addWidget(QLineEdit(str(config.get("session.auto_lock_minutes", 10))), 1, 1)
+        grid5.addWidget(
+            QLineEdit(str(config.get("session.auto_lock_minutes", 10))), 1, 1
+        )
         root.addLayout(grid5)
         root.addSpacing(8)
 

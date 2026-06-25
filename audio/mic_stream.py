@@ -22,7 +22,7 @@ class MicStream:
 
     SAMPLE_RATE = 16000
     CHANNELS = 1
-    FRAME_SAMPLES = 480      # 30 ms at 16 kHz (must be 10/20/30 ms for WebRTC VAD)
+    FRAME_SAMPLES = 480  # 30 ms at 16 kHz (must be 10/20/30 ms for WebRTC VAD)
     DTYPE = "int16"
 
     def __init__(self, audio_queue: Queue, device_index: int | None = None):
@@ -51,7 +51,11 @@ class MicStream:
             callback=self._callback,
         )
         self._stream.start()
-        logger.info("MicStream started ({}Hz, {} samples/frame)", self.SAMPLE_RATE, self.FRAME_SAMPLES)
+        logger.info(
+            "MicStream started ({}Hz, {} samples/frame)",
+            self.SAMPLE_RATE,
+            self.FRAME_SAMPLES,
+        )
 
     def stop(self) -> None:
         self._running = False
@@ -64,11 +68,11 @@ class MicStream:
     def _callback(self, indata: np.ndarray, frames: int, time, status) -> None:
         if status:
             logger.debug("MicStream status: {}", status)
-            
+
         if self._muted:
             return
 
-        raw = indata[:, 0].tobytes()   # int16 bytes
+        raw = indata[:, 0].tobytes()  # int16 bytes
         try:
             self._q.put_nowait(raw)
         except Full:

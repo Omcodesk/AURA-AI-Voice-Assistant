@@ -32,6 +32,7 @@ Method 2 (Manual via Task Scheduler):
 
 ======================================================================
 """
+
 import sys
 from pathlib import Path
 
@@ -39,4 +40,5 @@ from pathlib import Path
 if __name__ == "__main__":
     # Ensure current directory is in sys.path
     import app
+
     sys.exit(app.main())

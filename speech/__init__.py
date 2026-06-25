@@ -4,7 +4,9 @@ from speech.tts_engine import TTSThread
 from speech.response_formatter import format_for_speech, aura_prefix
 
 __all__ = [
-    "WhisperSTT", "TranscriptValidator",
+    "WhisperSTT",
+    "TranscriptValidator",
     "TTSThread",
-    "format_for_speech", "aura_prefix",
+    "format_for_speech",
+    "aura_prefix",
 ]

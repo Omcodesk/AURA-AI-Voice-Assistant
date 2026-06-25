@@ -3,11 +3,25 @@ import re
 from pathlib import Path
 from loguru import logger
 
+
 class CommandNormalizer:
     def __init__(self, synonym_map_path="config/synonym_map.json"):
         self.synonyms = {}
         self._load_synonyms(synonym_map_path)
-        self._stopwords = {"can", "you", "please", "could", "would", "hey", "jarvis", "aura", "kindly", "i", "want", "to"}
+        self._stopwords = {
+            "can",
+            "you",
+            "please",
+            "could",
+            "would",
+            "hey",
+            "jarvis",
+            "aura",
+            "kindly",
+            "i",
+            "want",
+            "to",
+        }
 
     def _load_synonyms(self, path):
         p = Path(path)
@@ -28,9 +42,9 @@ class CommandNormalizer:
         text = text.lower().strip()
         # Remove punctuation except dots for URLs
         text = re.sub(r"[^\w\s\.]", "", text)
-        
+
         words = text.split()
-        
+
         # 1. Verb normalization (simple typo/alias)
         verb_map = self.synonyms.get("verbs", {})
         cleaned_words = []
@@ -41,7 +55,8 @@ class CommandNormalizer:
                 cleaned_words.append(verb_map[w])
             else:
                 cleaned_words.append(w)
-                
+
         return " ".join(cleaned_words)
+
 
 normalizer = CommandNormalizer()

@@ -9,6 +9,7 @@ Flow:
   5. If no match → deny.
   6. On inactivity → deauthorize (session stays for conversation, actions blocked).
 """
+
 from __future__ import annotations
 import numpy as np
 from loguru import logger
@@ -21,14 +22,14 @@ class AccessDecision:
     username: str
     user_id: int | None
     confidence: float
-    reason: str   # "match" | "no_match" | "unauthorized" | "empty_registry"
+    reason: str  # "match" | "no_match" | "unauthorized" | "empty_registry"
 
     def __init__(self, granted, username, user_id, confidence, reason):
-        self.granted    = granted
-        self.username   = username
-        self.user_id    = user_id
+        self.granted = granted
+        self.username = username
+        self.user_id = user_id
         self.confidence = confidence
-        self.reason     = reason
+        self.reason = reason
 
     def __repr__(self):
         return f"AccessDecision(granted={self.granted}, user='{self.username}', conf={self.confidence:.3f})"
@@ -51,7 +52,9 @@ class AccessController:
 
         if not match["authorized"]:
             logger.warning("Auth: known user '{}' is not authorized", match["name"])
-            return AccessDecision(False, match["name"], match["id"], match["similarity"], "unauthorized")
+            return AccessDecision(
+                False, match["name"], match["id"], match["similarity"], "unauthorized"
+            )
 
         # Success
         registry.update_last_seen(match["id"])
@@ -59,11 +62,14 @@ class AccessController:
         logger.info("Auth: GRANTED for '{}' (confidence={:.3f})", match["name"], conf)
 
         # Publish to event bus
-        bus.publish(Events.AUTH_SUCCESS, {
-            "user": match["name"],
-            "user_id": match["id"],
-            "confidence": conf,
-        })
+        bus.publish(
+            Events.AUTH_SUCCESS,
+            {
+                "user": match["name"],
+                "user_id": match["id"],
+                "confidence": conf,
+            },
+        )
 
         return AccessDecision(True, match["name"], match["id"], conf, "match")
 

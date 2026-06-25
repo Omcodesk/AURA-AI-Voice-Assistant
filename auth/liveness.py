@@ -10,6 +10,7 @@ Anti-spoofing strategy:
 This is lightweight, requires no additional models, and effectively
 prevents static-photo / screen replay attacks.
 """
+
 from __future__ import annotations
 import time
 import wave
@@ -24,8 +25,27 @@ from core.config_loader import config
 
 # Number words Whisper may output
 _NUMBER_WORDS = {
-    "one","two","three","four","five","six","seven","eight","nine","ten",
-    "zero","1","2","3","4","5","6","7","8","9","0",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "zero",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "0",
 }
 
 
@@ -39,7 +59,7 @@ class LivenessChallenge:
     """
 
     RECORD_SECONDS = 3
-    SAMPLE_RATE    = 16000
+    SAMPLE_RATE = 16000
 
     def __init__(self, on_result: Callable[[bool, str], None]):
         """
@@ -85,11 +105,17 @@ class LivenessChallenge:
     def _record(self) -> bytes:
         """Capture RECORD_SECONDS of 16kHz mono int16 PCM."""
         frames = []
+
         def cb(indata, f, t, s):
             frames.append(indata.copy())
 
-        with sd.InputStream(samplerate=self.SAMPLE_RATE, channels=1,
-                            dtype="int16", blocksize=480, callback=cb):
+        with sd.InputStream(
+            samplerate=self.SAMPLE_RATE,
+            channels=1,
+            dtype="int16",
+            blocksize=480,
+            callback=cb,
+        ):
             deadline = time.time() + self.RECORD_SECONDS
             while time.time() < deadline and not self._cancelled.is_set():
                 time.sleep(0.05)
@@ -115,6 +141,7 @@ class LivenessChallenge:
             return ""
         try:
             from groq import Groq
+
             buf = io.BytesIO()
             with wave.open(buf, "wb") as wf:
                 wf.setnchannels(1)

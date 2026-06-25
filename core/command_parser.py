@@ -5,9 +5,10 @@ core/command_parser.py — Transforms raw router intents into structured ParsedC
 from core.result_types import ParsedCommand
 from core.policy_engine import policy_engine
 
+
 class CommandParser:
     """Normalizes raw (intent, args, text) into a ParsedCommand."""
-    
+
     def parse(self, raw_intent: str, args: dict, text: str) -> ParsedCommand:
         intent = "unsupported"
         action = raw_intent
@@ -23,7 +24,13 @@ class CommandParser:
         elif raw_intent in ("brightness_up", "brightness_down"):
             intent = "system_control"
             action = "brightness"
-        elif raw_intent in ("media_play", "media_pause", "media_next", "media_prev", "media_stop"):
+        elif raw_intent in (
+            "media_play",
+            "media_pause",
+            "media_next",
+            "media_prev",
+            "media_stop",
+        ):
             intent = "media_control"
             action = raw_intent.replace("media_", "")
         elif raw_intent in ("open_app", "close_app"):
@@ -31,7 +38,12 @@ class CommandParser:
             if "whatsapp" in app_name.lower():
                 intent = "whatsapp"
                 action = "open_chat"
-                target = app_name.lower().replace("whatsapp chat with", "").replace("whatsapp", "").strip()
+                target = (
+                    app_name.lower()
+                    .replace("whatsapp chat with", "")
+                    .replace("whatsapp", "")
+                    .strip()
+                )
             else:
                 intent = "app_control"
                 action = raw_intent
@@ -74,25 +86,28 @@ class CommandParser:
         elif raw_intent == "conversation":
             intent = "conversation"
             action = "chat"
-            
+
         cmd = ParsedCommand(
             intent=intent,
             action=action,
             target=target,
             arguments=args,
-            source_text=text
+            source_text=text,
         )
-        
+
         # Apply policies
         cmd = policy_engine.apply_policies(cmd)
-        
+
         # Phase 4 strict explicit confirmation
         dangerous_actions = ("shutdown", "restart", "lock", "sleep")
-        if (cmd.intent in ("whatsapp", "email") and cmd.action in ("send_message", "draft_email")) or \
-           (cmd.intent == "system_control" and cmd.action in dangerous_actions):
+        if (
+            cmd.intent in ("whatsapp", "email")
+            and cmd.action in ("send_message", "draft_email")
+        ) or (cmd.intent == "system_control" and cmd.action in dangerous_actions):
             cmd.requires_confirmation = True
-            
+
         return cmd
+
 
 # Singleton
 command_parser = CommandParser()

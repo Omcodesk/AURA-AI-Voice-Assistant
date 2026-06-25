@@ -9,7 +9,7 @@ cmd = ParsedCommand(
     arguments={},
     requires_auth=False,
     requires_confirmation=False,
-    source_text="open whatsapp"
+    source_text="open whatsapp",
 )
 
 handle_open_whatsapp(cmd)

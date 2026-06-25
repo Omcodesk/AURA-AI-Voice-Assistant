@@ -10,13 +10,32 @@ import re
 from loguru import logger
 
 # Phrases that Whisper commonly hallucinates on silence / background noise
-_NOISE_PHRASES = frozenset([
-    "thank you", "thanks", "hmm", "uh", "um", "ah",
-    "you", "bye", "the", "ok", "okay", "i",
-    "thanks for watching", "thank you for watching",
-    "subscribe", "like and subscribe",
-    ".", ",", "!", "?", "...", "huh",
-])
+_NOISE_PHRASES = frozenset(
+    [
+        "thank you",
+        "thanks",
+        "hmm",
+        "uh",
+        "um",
+        "ah",
+        "you",
+        "bye",
+        "the",
+        "ok",
+        "okay",
+        "i",
+        "thanks for watching",
+        "thank you for watching",
+        "subscribe",
+        "like and subscribe",
+        ".",
+        ",",
+        "!",
+        "?",
+        "...",
+        "huh",
+    ]
+)
 
 _PUNCTUATION_ONLY = re.compile(r"^[\s\W]+$")
 

@@ -40,7 +40,10 @@ class ConfigLoader:
         self._cfg = self._load_yaml(config_dir / "settings.yaml")
         self._security = self._load_yaml(config_dir / "security.yaml")
 
-        logger.info("Config loaded — version={} (Phase 4: Universal Brain & Safety)", self.get("aura.version", "1.0.0-phase4"))
+        logger.info(
+            "Config loaded — version={} (Phase 4: Universal Brain & Safety)",
+            self.get("aura.version", "1.0.0-phase4"),
+        )
 
     @staticmethod
     def _load_yaml(path: Path) -> dict:

@@ -1,5 +1,6 @@
 import re
 
+
 class MultiIntentParser:
     def __init__(self):
         # Splitting on common conjunctions
@@ -12,5 +13,6 @@ class MultiIntentParser:
         """
         segments = self._split_pattern.split(text)
         return [s.strip() for s in segments if s.strip()]
+
 
 multi_parser = MultiIntentParser()

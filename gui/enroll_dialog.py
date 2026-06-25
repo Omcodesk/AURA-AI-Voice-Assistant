@@ -5,12 +5,17 @@ Shows a name input + live camera feed during capture.
 Called from the admin screen "Enrol New User" button or
 from AuthWindow when the registry is empty.
 """
+
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout,
-    QLabel, QLineEdit, QPushButton,
+    QDialog,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
     QMessageBox,
 )
 from loguru import logger
@@ -20,7 +25,8 @@ class EnrollDialog(QDialog):
     """
     Simple dialog: enter name → click START ENROL → auth_window does the rest.
     """
-    enroll_start = Signal(str)   # emitted with the name to begin enrollment
+
+    enroll_start = Signal(str)  # emitted with the name to begin enrollment
 
     def __init__(self, parent=None):
         super().__init__(parent)

@@ -67,7 +67,7 @@ class VadManager:
             self._pre_buf.append(frame)
             if self._in_speech:
                 self._silence_count += 1
-                self._speech_frames.append(frame)   # include trailing silence
+                self._speech_frames.append(frame)  # include trailing silence
 
                 if self._silence_count >= self._silence_frames:
                     self._in_speech = False

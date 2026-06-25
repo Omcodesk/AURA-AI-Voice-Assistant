@@ -25,13 +25,19 @@ class State(str, Enum):
 
 # Valid transitions: from_state → {allowed to_states}
 _TRANSITIONS: dict[State, set[State]] = {
-    State.LOCKED:    {State.IDLE, State.SPEAKING, State.ERROR},
-    State.IDLE:      {State.LISTENING, State.SPEAKING, State.LOCKED, State.ERROR},
+    State.LOCKED: {State.IDLE, State.SPEAKING, State.ERROR},
+    State.IDLE: {State.LISTENING, State.SPEAKING, State.LOCKED, State.ERROR},
     State.LISTENING: {State.THINKING, State.IDLE, State.LOCKED, State.ERROR},
-    State.THINKING:  {State.EXECUTING, State.SPEAKING, State.IDLE, State.LISTENING, State.ERROR},
+    State.THINKING: {
+        State.EXECUTING,
+        State.SPEAKING,
+        State.IDLE,
+        State.LISTENING,
+        State.ERROR,
+    },
     State.EXECUTING: {State.SPEAKING, State.IDLE, State.ERROR},
-    State.SPEAKING:  {State.LISTENING, State.IDLE, State.LOCKED, State.ERROR},
-    State.ERROR:     {State.IDLE, State.SPEAKING, State.LOCKED},
+    State.SPEAKING: {State.LISTENING, State.IDLE, State.LOCKED, State.ERROR},
+    State.ERROR: {State.IDLE, State.SPEAKING, State.LOCKED},
 }
 
 

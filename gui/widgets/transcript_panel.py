@@ -5,8 +5,12 @@ gui/widgets/transcript_panel.py — Scrollable card-based conversation transcrip
 from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QScrollArea,
-    QFrame, QLabel, QSizePolicy,
+    QWidget,
+    QVBoxLayout,
+    QScrollArea,
+    QFrame,
+    QLabel,
+    QSizePolicy,
 )
 
 

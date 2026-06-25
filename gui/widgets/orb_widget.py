@@ -16,8 +16,12 @@ import math
 
 from PySide6.QtCore import Qt, QTimer, QPointF, QRectF
 from PySide6.QtGui import (
-    QPainter, QPainterPath, QColor, QRadialGradient,
-    QPen, QConicalGradient,
+    QPainter,
+    QPainterPath,
+    QColor,
+    QRadialGradient,
+    QPen,
+    QConicalGradient,
 )
 from PySide6.QtWidgets import QWidget
 
@@ -25,13 +29,13 @@ from core.state_machine import State
 
 # Palette
 _COLORS = {
-    State.LOCKED:    ("#FF3355", "#880022"),
-    State.IDLE:      ("#0066CC", "#003366"),
+    State.LOCKED: ("#FF3355", "#880022"),
+    State.IDLE: ("#0066CC", "#003366"),
     State.LISTENING: ("#00D4FF", "#006688"),
-    State.THINKING:  ("#7B5FFF", "#3A1F88"),
+    State.THINKING: ("#7B5FFF", "#3A1F88"),
     State.EXECUTING: ("#FF9900", "#884400"),
-    State.SPEAKING:  ("#00FF88", "#004422"),
-    State.ERROR:     ("#FF3355", "#880022"),
+    State.SPEAKING: ("#00FF88", "#004422"),
+    State.ERROR: ("#FF3355", "#880022"),
 }
 
 
@@ -45,14 +49,14 @@ class OrbWidget(QWidget):
         self.setMinimumSize(300, 300)
         self._state = State.IDLE
 
-        self._tick = 0           # animation frame counter
-        self._ring_phase = 0.0   # for expanding rings
-        self._spin_angle = 0.0   # for thinking arc rotation
-        self._wave_phase = 0.0   # for speaking wave
+        self._tick = 0  # animation frame counter
+        self._ring_phase = 0.0  # for expanding rings
+        self._spin_angle = 0.0  # for thinking arc rotation
+        self._wave_phase = 0.0  # for speaking wave
 
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._advance)
-        self._timer.start(16)    # ~60 fps
+        self._timer.start(16)  # ~60 fps
 
     def set_state(self, state: State) -> None:
         if self._state != state:
@@ -132,7 +136,7 @@ class OrbWidget(QWidget):
     def _draw_pulse_ring(self, p: QPainter, cx, cy, r, color: QColor, state: State):
         # Slow breathing pulse
         if state == State.IDLE:
-            t = (math.sin(self._ring_phase * 0.5) + 1) / 2     # 0→1 slow
+            t = (math.sin(self._ring_phase * 0.5) + 1) / 2  # 0→1 slow
         elif state in (State.LOCKED, State.ERROR):
             t = (math.sin(self._tick * 0.05) + 1) / 2
         elif state == State.EXECUTING:
@@ -151,7 +155,7 @@ class OrbWidget(QWidget):
     def _draw_listening_rings(self, p: QPainter, cx, cy, r, color: QColor):
         for i in range(3):
             phase = (self._ring_phase + i * (2 * math.pi / 3)) % (2 * math.pi)
-            expand = (phase / (2 * math.pi))      # 0→1
+            expand = phase / (2 * math.pi)  # 0→1
             ring_r = r + 10 + expand * 55
             alpha = int(100 * (1 - expand))
             c = QColor(color)

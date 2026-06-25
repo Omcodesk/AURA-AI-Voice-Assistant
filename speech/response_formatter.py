@@ -18,14 +18,14 @@ def format_for_speech(text: str) -> str:
         return ""
 
     # Strip markdown formatting
-    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)   # code blocks
-    text = re.sub(r"`[^`]+`", "", text)                       # inline code
-    text = re.sub(r"#{1,6}\s*", "", text)                     # headers
-    text = re.sub(r"\*{1,2}([^*]+)\*{1,2}", r"\1", text)     # bold/italic
+    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)  # code blocks
+    text = re.sub(r"`[^`]+`", "", text)  # inline code
+    text = re.sub(r"#{1,6}\s*", "", text)  # headers
+    text = re.sub(r"\*{1,2}([^*]+)\*{1,2}", r"\1", text)  # bold/italic
     text = re.sub(r"^\s*[-*•]\s+", "", text, flags=re.MULTILINE)  # bullets
-    text = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", text)    # links → label
-    text = re.sub(r"\n+", " ", text)                          # newlines → space
-    text = re.sub(r"\s{2,}", " ", text)                       # collapse spaces
+    text = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", text)  # links → label
+    text = re.sub(r"\n+", " ", text)  # newlines → space
+    text = re.sub(r"\s{2,}", " ", text)  # collapse spaces
 
     text = text.strip()
 
@@ -44,17 +44,17 @@ def format_for_speech(text: str) -> str:
 def aura_prefix(action: str) -> str:
     """Short spoken prefix for action acknowledgements."""
     prefixes = {
-        "open_app":    "Opening that for you.",
-        "close_app":   "Closing that now.",
-        "screenshot":  "Screenshot taken.",
-        "volume":      "Volume adjusted.",
-        "brightness":  "Brightness adjusted.",
-        "search":      "Searching now.",
-        "weather":     "",
-        "news":        "",
-        "reminder":    "Reminder set.",
-        "error":       "I ran into an issue.",
-        "confirm":     "Please confirm: ",
-        "denied":      "I can't do that without confirmation.",
+        "open_app": "Opening that for you.",
+        "close_app": "Closing that now.",
+        "screenshot": "Screenshot taken.",
+        "volume": "Volume adjusted.",
+        "brightness": "Brightness adjusted.",
+        "search": "Searching now.",
+        "weather": "",
+        "news": "",
+        "reminder": "Reminder set.",
+        "error": "I ran into an issue.",
+        "confirm": "Please confirm: ",
+        "denied": "I can't do that without confirmation.",
     }
     return prefixes.get(action, "")

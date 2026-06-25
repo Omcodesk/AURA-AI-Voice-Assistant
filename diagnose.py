@@ -2,8 +2,10 @@
 Quick diagnostic: tests mic capture, VAD speech detection, and TTS.
 Run this standalone - no GUI needed.
 """
+
 import sys, time, queue, threading
-sys.path.insert(0, '.')
+
+sys.path.insert(0, ".")
 
 print("=" * 50)
 print("JARVIS Diagnostic Tool")
@@ -13,12 +15,13 @@ print("=" * 50)
 print("\n[1] Testing TTS...")
 try:
     import pyttsx3
+
     engine = pyttsx3.init()
-    voices = engine.getProperty('voices')
+    voices = engine.getProperty("voices")
     print(f"    Found {len(voices)} voice(s)")
     for i, v in enumerate(voices[:3]):
         print(f"    [{i}] {v.name}")
-    engine.setProperty('rate', 175)
+    engine.setProperty("rate", 175)
     engine.say("TTS test successful. JARVIS can speak.")
     engine.runAndWait()
     print("    TTS: OK")
@@ -32,7 +35,7 @@ try:
     import numpy as np
 
     devices = sd.query_devices()
-    default_in = sd.query_devices(kind='input')
+    default_in = sd.query_devices(kind="input")
     print(f"    Default mic: {default_in['name']}")
 
     audio_q = queue.Queue()
@@ -43,8 +46,9 @@ try:
         max_level[0] = max(max_level[0], level)
         audio_q.put(indata.copy())
 
-    with sd.InputStream(samplerate=16000, channels=1, dtype='float32',
-                        blocksize=480, callback=callback):
+    with sd.InputStream(
+        samplerate=16000, channels=1, dtype="float32", blocksize=480, callback=callback
+    ):
         print("    Recording 5 seconds... SPEAK NOW")
         time.sleep(5)
 
@@ -71,7 +75,7 @@ try:
     audio_q2 = queue.Queue()
 
     def cb2(indata, frames, time, status):
-        pcm = (indata[:, 0] * 32767).astype('int16').tobytes()
+        pcm = (indata[:, 0] * 32767).astype("int16").tobytes()
         audio_q2.put(pcm)
 
     def vad_worker():
@@ -87,8 +91,9 @@ try:
     t = threading.Thread(target=vad_worker, daemon=True)
     t.start()
 
-    with sd.InputStream(samplerate=16000, channels=1, dtype='int16',
-                        blocksize=480, callback=cb2):
+    with sd.InputStream(
+        samplerate=16000, channels=1, dtype="int16", blocksize=480, callback=cb2
+    ):
         print("    Listening for 5 seconds... SPEAK NOW")
         time.sleep(5)
 
@@ -96,7 +101,9 @@ try:
     pct = (speech_frames[0] / max(total_frames[0], 1)) * 100
     print(f"    Speech frames: {speech_frames[0]}/{total_frames[0]} ({pct:.1f}%)")
     if pct < 5:
-        print("    WARNING: VAD detected very little speech. Check mic or speak louder.")
+        print(
+            "    WARNING: VAD detected very little speech. Check mic or speak louder."
+        )
     else:
         print("    VAD: OK - speech detected")
 except Exception as e:

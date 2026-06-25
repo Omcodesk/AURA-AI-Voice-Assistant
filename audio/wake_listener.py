@@ -46,7 +46,10 @@ class WakeDetector:
         """
         transcript = self._stt.transcribe(audio)
         import string
-        clean_transcript = transcript.lower().translate(str.maketrans('', '', string.punctuation))
+
+        clean_transcript = transcript.lower().translate(
+            str.maketrans("", "", string.punctuation)
+        )
         matched = self._phrase in clean_transcript
         if matched:
             logger.info("Wake phrase detected in: '{}'", transcript)

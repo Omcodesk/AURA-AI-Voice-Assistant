@@ -50,12 +50,12 @@ _TIER_MAP: dict[str, int] = {
     "restart": 3,
     "sleep": 3,
     "overwrite": 3,
-    "lock": 0,    # lock is safe (pro-security)
+    "lock": 0,  # lock is safe (pro-security)
 }
 
 
 def get_tier(intent: str) -> int:
-    return _TIER_MAP.get(intent, 1)    # unknown = tier 1 by default
+    return _TIER_MAP.get(intent, 1)  # unknown = tier 1 by default
 
 
 def requires_confirmation(intent: str) -> bool:
@@ -76,4 +76,5 @@ def protected_action_allowed(intent: str) -> tuple[bool, str]:
     If reason == 'confirm_required' → ask for spoken confirmation.
     """
     from core.session_manager import session
+
     return session.gate(intent)

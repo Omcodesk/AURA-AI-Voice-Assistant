@@ -19,6 +19,7 @@ class WhisperSTT:
         if not api_key:
             raise ValueError("GROQ_API_KEY is required for STT.")
         from groq import Groq
+
         self._client = Groq(api_key=api_key, timeout=20.0)
         self._model = model
         logger.info("WhisperSTT ready (model={})", model)
@@ -56,7 +57,7 @@ class WhisperSTT:
             buf = io.BytesIO()
             with wave.open(buf, "wb") as wf:
                 wf.setnchannels(1)
-                wf.setsampwidth(2)          # 16-bit
+                wf.setsampwidth(2)  # 16-bit
                 wf.setframerate(sample_rate)
                 wf.writeframes(pcm)
             return buf.getvalue()

@@ -2,6 +2,7 @@
 auth/user_registry.py — Persistent user store: names + face embeddings in SQLite.
 Embeddings are stored as numpy blobs. Cosine similarity used for matching.
 """
+
 from __future__ import annotations
 from pathlib import Path
 from typing import Optional
@@ -12,19 +13,20 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 from loguru import logger
 from core.config_loader import config
 
-
 # ── Schema ────────────────────────────────────────────────────────────────────
 
+
 class EnrolledUser(SQLModel, table=True):
-    id: Optional[int]        = Field(default=None, primary_key=True)
-    name: str                = Field(index=True)
-    authorized: bool         = Field(default=True)
-    embedding_blob: bytes    = Field()            # numpy float32 array as bytes
-    enrolled_at: datetime    = Field(default_factory=datetime.now)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
+    authorized: bool = Field(default=True)
+    embedding_blob: bytes = Field()  # numpy float32 array as bytes
+    enrolled_at: datetime = Field(default_factory=datetime.now)
     last_seen: Optional[datetime] = Field(default=None)
 
 
 # ── Registry ──────────────────────────────────────────────────────────────────
+
 
 class UserRegistry:
     _instance: UserRegistry | None = None
@@ -40,7 +42,7 @@ class UserRegistry:
         db_path.parent.mkdir(parents=True, exist_ok=True)
         self._engine = create_engine(f"sqlite:///{db_path}", echo=False)
         SQLModel.metadata.create_all(self._engine)
-        
+
         # Migrate enrolled users from jarvis.db if aura.db is empty
         try:
             if self.is_empty():
@@ -48,25 +50,37 @@ class UserRegistry:
                 if old_db_path.exists():
                     logger.info("Migrating enrolled users from jarvis.db to aura.db...")
                     old_engine = create_engine(f"sqlite:///{old_db_path}", echo=False)
-                    with Session(old_engine) as old_sess, Session(self._engine) as new_sess:
+                    with Session(old_engine) as old_sess, Session(
+                        self._engine
+                    ) as new_sess:
                         from sqlalchemy import text
-                        users = old_sess.execute(text("SELECT name, authorized, embedding_blob, enrolled_at, last_seen FROM enrolleduser")).fetchall()
+
+                        users = old_sess.execute(
+                            text(
+                                "SELECT name, authorized, embedding_blob, enrolled_at, last_seen FROM enrolleduser"
+                            )
+                        ).fetchall()
                         for u in users:
                             new_sess.execute(
-                                text("INSERT INTO enrolleduser (name, authorized, embedding_blob, enrolled_at, last_seen) VALUES (:name, :authorized, :embedding_blob, :enrolled_at, :last_seen)"),
+                                text(
+                                    "INSERT INTO enrolleduser (name, authorized, embedding_blob, enrolled_at, last_seen) VALUES (:name, :authorized, :embedding_blob, :enrolled_at, :last_seen)"
+                                ),
                                 {
                                     "name": u[0],
                                     "authorized": u[1],
                                     "embedding_blob": u[2],
                                     "enrolled_at": u[3],
-                                    "last_seen": u[4]
-                                }
+                                    "last_seen": u[4],
+                                },
                             )
                         new_sess.commit()
-                        logger.info("Successfully migrated {} users from jarvis.db to aura.db", len(users))
+                        logger.info(
+                            "Successfully migrated {} users from jarvis.db to aura.db",
+                            len(users),
+                        )
         except Exception as e:
             logger.warning("Failed to migrate enrolled users: {}", e)
-            
+
         logger.info("UserRegistry ready — {} users enrolled", self.count())
 
     # ── Write ─────────────────────────────────────────────────────────────────

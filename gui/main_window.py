@@ -17,9 +17,16 @@ from threading import Thread, Timer
 from PySide6.QtCore import Qt, Slot, Signal, QObject
 from PySide6.QtGui import QFont, QFontDatabase, QPalette, QColor
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QStackedWidget,
-    QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-    QSystemTrayIcon, QMenu, QStyle
+    QMainWindow,
+    QWidget,
+    QStackedWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QLabel,
+    QSystemTrayIcon,
+    QMenu,
+    QStyle,
 )
 from loguru import logger
 
@@ -57,12 +64,13 @@ from services.session_guard import session_guard
 
 class _Signals(QObject):
     """Cross-thread Qt signal carrier — all signals emitted on Qt thread."""
-    state_changed    = Signal(str)
-    user_transcript  = Signal(str)
-    aura_response    = Signal(str)
-    activity_update  = Signal(str)
-    countdown_start  = Signal(int)
-    countdown_stop   = Signal()
+
+    state_changed = Signal(str)
+    user_transcript = Signal(str)
+    aura_response = Signal(str)
+    activity_update = Signal(str)
+    countdown_start = Signal(int)
+    countdown_stop = Signal()
 
 
 class MainWindow(QMainWindow):
@@ -76,7 +84,9 @@ class MainWindow(QMainWindow):
         self._signals = _Signals()
         self._audio_queue: Queue[bytes] = Queue(maxsize=300)
         self._active_timer: Timer | None = None
-        self._active_timeout = config.get("session.active_window_timeout", 300) # Increased from 30 to 300
+        self._active_timeout = config.get(
+            "session.active_window_timeout", 300
+        )  # Increased from 30 to 300
 
         # Initialised in _start_pipeline()
         self._stt: WhisperSTT | None = None
@@ -131,17 +141,17 @@ class MainWindow(QMainWindow):
         top_layout.addStretch()
 
         self._nav_console = self._make_nav_btn("CONSOLE", 1)
-        self._nav_admin   = self._make_nav_btn("SETTINGS", 2)
-        self._nav_memory  = self._make_nav_btn("MEMORY", 3)
+        self._nav_admin = self._make_nav_btn("SETTINGS", 2)
+        self._nav_memory = self._make_nav_btn("MEMORY", 3)
         for btn in (self._nav_console, self._nav_admin, self._nav_memory):
             top_layout.addWidget(btn)
 
         # ── Screen stack ───────────────────────────────────────────────────
         self._stack = QStackedWidget()
-        self._auth        = AuthWindow()
-        self._console     = ConsoleWindow()
-        self._admin       = AdminWindow()
-        self._memory_win  = MemoryWindow()
+        self._auth = AuthWindow()
+        self._console = ConsoleWindow()
+        self._admin = AdminWindow()
+        self._memory_win = MemoryWindow()
 
         # index 0 = auth (pre-login), 1 = console, 2 = admin, 3 = memory
         self._stack.addWidget(self._auth)
@@ -164,14 +174,16 @@ class MainWindow(QMainWindow):
         self._nav_console.hide()
         self._nav_admin.hide()
         self._nav_memory.hide()
-        
+
         # Start microphone in background while LOCKED
         self._start_pipeline()
 
         # Check if auth bypass is requested (via command line or config)
         import sys
+
         if "--bypass-auth" in sys.argv or config.get("aura.dev_mode", False):
             from PySide6.QtCore import QTimer
+
             QTimer.singleShot(100, self._auto_bypass_startup)
 
     def _auto_bypass_startup(self):
@@ -193,23 +205,23 @@ class MainWindow(QMainWindow):
     def _setup_tray_icon(self):
         # Create tray icon
         self._tray_icon = QSystemTrayIcon(self)
-        
+
         # Use a standard Qt icon for the tray
         icon = self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon)
         self._tray_icon.setIcon(icon)
         self._tray_icon.setToolTip("AURA - AI Voice Assistant")
-        
+
         # Create context menu
         tray_menu = QMenu(self)
-        
+
         show_action = tray_menu.addAction("Show AURA")
         show_action.triggered.connect(self._tray_show_requested)
-        
+
         quit_action = tray_menu.addAction("Exit")
         quit_action.triggered.connect(self.close)
-        
+
         self._tray_icon.setContextMenu(tray_menu)
-        
+
         # Show/hide on double click
         self._tray_icon.activated.connect(self._on_tray_activated)
         self._tray_icon.show()
@@ -243,13 +255,13 @@ class MainWindow(QMainWindow):
         self._nav_console.setChecked(True)
         self._switch_screen(1)
         self._console.load_history()
-        
+
         sm.transition(State.IDLE)
         # We transition to SPEAKING first so the VAD doesn't capture the greeting
         if sm.transition(State.SPEAKING):
             self._signals.activity_update.emit("Authenticated. Greeting user...")
-            self._start_active_timer() # This now handles both the timer and the UI signals
-        
+            self._start_active_timer()  # This now handles both the timer and the UI signals
+
         self._tts.speak(f"Access granted. Welcome {username}.")
 
     def _open_enroll_dialog(self):
@@ -276,13 +288,29 @@ class MainWindow(QMainWindow):
         sig.countdown_start.connect(self._status_bar.start_countdown)
         sig.countdown_stop.connect(self._status_bar.stop_countdown)
 
-        bus.subscribe(Events.STATE_CHANGED, lambda p: self._signals.state_changed.emit(p.get("to", "IDLE")))
+        bus.subscribe(
+            Events.STATE_CHANGED,
+            lambda p: self._signals.state_changed.emit(p.get("to", "IDLE")),
+        )
         bus.subscribe(Events.SESSION_LOCKED, lambda _: self._on_locked())
-        bus.subscribe(Events.AUTH_SUCCESS,   lambda p: logger.info("Event: AUTH_SUCCESS user={}", p.get("user")))
-        
+        bus.subscribe(
+            Events.AUTH_SUCCESS,
+            lambda p: logger.info("Event: AUTH_SUCCESS user={}", p.get("user")),
+        )
+
         # Phase 2: Agent Telemetry Wiring
-        bus.subscribe("agent.thought", lambda p: self._signals.activity_update.emit(f"[Planner] {p.get('thought', '')}"))
-        bus.subscribe("agent.action", lambda p: self._signals.activity_update.emit(f"Executing: {p.get('tool', '')}"))
+        bus.subscribe(
+            "agent.thought",
+            lambda p: self._signals.activity_update.emit(
+                f"[Planner] {p.get('thought', '')}"
+            ),
+        )
+        bus.subscribe(
+            "agent.action",
+            lambda p: self._signals.activity_update.emit(
+                f"Executing: {p.get('tool', '')}"
+            ),
+        )
 
     # ── Audio pipeline ────────────────────────────────────────────────────────
 
@@ -299,9 +327,15 @@ class MainWindow(QMainWindow):
         # ── STT (Groq Whisper — used for BOTH wake detection and commands) ─
         api_key = config.groq_api_key()
         if not api_key:
-            logger.error("GROQ_API_KEY is not set — wake detection and STT will not work!")
-            self._tts.speak("Warning: Groq API key not found. Please set it in the .env file.")
-            self._signals.aura_response.emit("⚠ GROQ_API_KEY missing — check .env file.")
+            logger.error(
+                "GROQ_API_KEY is not set — wake detection and STT will not work!"
+            )
+            self._tts.speak(
+                "Warning: Groq API key not found. Please set it in the .env file."
+            )
+            self._signals.aura_response.emit(
+                "⚠ GROQ_API_KEY missing — check .env file."
+            )
         else:
             self._stt = WhisperSTT(
                 api_key=api_key,
@@ -313,11 +347,11 @@ class MainWindow(QMainWindow):
 
         # ── VAD — single instance, always running ─────────────────────────
         self._vad = VadManager(
-            on_speech_end=self._on_utterance_captured,   # fires from VAD thread
+            on_speech_end=self._on_utterance_captured,  # fires from VAD thread
             aggressiveness=config.get("vad.aggressiveness", 2),
-            silence_frames=config.get("vad.silence_frames", 30), # tuned from 35
-            min_speech_frames=config.get("vad.min_speech_frames", 8), # tuned from 15
-            pre_speech_pad=config.get("vad.pre_speech_pad_frames", 7), # tuned from 10
+            silence_frames=config.get("vad.silence_frames", 30),  # tuned from 35
+            min_speech_frames=config.get("vad.min_speech_frames", 8),  # tuned from 15
+            pre_speech_pad=config.get("vad.pre_speech_pad_frames", 7),  # tuned from 10
         )
 
         # ── VAD consumer thread — feeds mic frames into VadManager ────────
@@ -332,9 +366,10 @@ class MainWindow(QMainWindow):
 
         # ── Dashboard Scheduler ───────────────────────────────────────────
         from PySide6.QtCore import QTimer
+
         self._scheduler_timer = QTimer(self)
         self._scheduler_timer.timeout.connect(self._check_scheduler)
-        self._scheduler_timer.start(30000) # Check every 30 seconds
+        self._scheduler_timer.start(30000)  # Check every 30 seconds
         logger.info("Scheduler started (30s interval)")
 
         # Announce
@@ -365,6 +400,7 @@ class MainWindow(QMainWindow):
         """
         # Phase 4: Media Cooldown (Self-listening protection)
         import time
+
         if time.time() - self._last_media_cmd_time < 1.5:
             logger.debug("Ignoring utterance during media cooldown.")
             self._vad.reset()
@@ -374,11 +410,18 @@ class MainWindow(QMainWindow):
 
         if state in (State.IDLE, State.LOCKED):
             # Check if this utterance is the wake phrase
-            Thread(target=self._check_wake, args=(audio,), daemon=True, name="wake-check").start()
+            Thread(
+                target=self._check_wake, args=(audio,), daemon=True, name="wake-check"
+            ).start()
 
         elif state == State.LISTENING:
             # User is giving a command — process it
-            Thread(target=self._process_command, args=(audio,), daemon=True, name="cmd-proc").start()
+            Thread(
+                target=self._process_command,
+                args=(audio,),
+                daemon=True,
+                name="cmd-proc",
+            ).start()
 
         # All other states (THINKING, SPEAKING, etc.) — ignore audio
 
@@ -394,6 +437,7 @@ class MainWindow(QMainWindow):
         if is_wake:
             if sm.is_(State.LOCKED):
                 from PySide6.QtCore import QMetaObject, Qt
+
                 QMetaObject.invokeMethod(self, "_start_face_auth", Qt.QueuedConnection)
             else:
                 if sm.transition(State.LISTENING):
@@ -414,8 +458,9 @@ class MainWindow(QMainWindow):
         self.showNormal()
         self.raise_()
         self.activateWindow()
-        
+
         import sys
+
         if "--bypass-auth" in sys.argv or config.get("aura.dev_mode", False):
             logger.info("Dev Mode: Bypassing face authentication on wake.")
             self._on_auth_proceed("Omm")
@@ -447,7 +492,9 @@ class MainWindow(QMainWindow):
 
         if not valid:
             logger.info("Transcript rejected ({}): '{}'", reason, text)
-            self._signals.activity_update.emit(f"I didn't hear that clearly. Try again?")
+            self._signals.activity_update.emit(
+                f"I didn't hear that clearly. Try again?"
+            )
             sm.transition(State.LISTENING)
             self._vad.reset()
             return
@@ -465,10 +512,10 @@ class MainWindow(QMainWindow):
         cmds = router.route(text)
         if not cmds:
             return
-            
-        cmd = cmds[0] # AURA Phase 4: process only the first intent
+
+        cmd = cmds[0]  # AURA Phase 4: process only the first intent
         logger.info("Universal Brain: Selected intent '{}'", cmd.intent)
-        
+
         # ── 3. Authorization Gate ──
         allowed, reason = session_guard.verify_access(cmd)
         if not allowed and reason == "re_auth_required":
@@ -478,20 +525,27 @@ class MainWindow(QMainWindow):
             self._tts.speak(response)
             # Re-open auth window
             from PySide6.QtCore import QTimer
+
             QTimer.singleShot(3500, self._trigger_reauth)
             return
-    
+
         # ── 4. Confirmation Gate (Dangerous Actions) ──
         if cmd.requires_confirmation:
             confirmation_service.request_confirmation(cmd)
             action_name = cmd.action.replace("_", " ")
-            
+
             response = f"I'm ready to {action_name}. Please confirm — say yes to proceed or no to cancel."
-            
+
             # Show visual dialog on main thread
             from PySide6.QtCore import QMetaObject, Q_ARG
-            QMetaObject.invokeMethod(self, "_show_confirmation_dialog", Qt.QueuedConnection, Q_ARG(str, action_name))
-            
+
+            QMetaObject.invokeMethod(
+                self,
+                "_show_confirmation_dialog",
+                Qt.QueuedConnection,
+                Q_ARG(str, action_name),
+            )
+
             self._respond(response)
             # Active Window Timer for confirmation (short 6s window)
             self._start_confirmation_timer()
@@ -515,10 +569,11 @@ class MainWindow(QMainWindow):
         else:
             sm.transition(State.EXECUTING)
             result = dispatcher.dispatch(cmd)
-            
+
             # Phase 4: Media Cooldown trigger
             if cmd.intent in ("media_control", "volume", "volume_up", "volume_down"):
                 import time
+
                 self._last_media_cmd_time = time.time()
                 logger.debug("Media cooldown initiated.")
 
@@ -529,10 +584,10 @@ class MainWindow(QMainWindow):
         """Processes restricted voice input during the confirmation window."""
         text = text.lower().strip()
         logger.info("Confirmation mode heard: '{}'", text)
-        
+
         yes_list = ("yes", "confirm", "do it", "proceed", "yeah", "yep")
         no_list = ("no", "cancel", "stop", "don't", "dont", "nope")
-        
+
         if any(word in text for word in yes_list):
             logger.info("Voice confirmation: YES")
             self._on_confirmation_yes()
@@ -543,10 +598,14 @@ class MainWindow(QMainWindow):
             logger.warning("Unrecognized confirmation reply: '{}'. Ignoring.", text)
             # User instructions: "if the reply is unclear, ask once more or cancel safely"
             # For simplicity and speed, we'll cancel safely if unheard or ask once
-            self._respond("I didn't catch that. Please say yes to confirm or no to cancel.")
-            self._start_confirmation_timer() # Reset timer for one more try
-            
-        memory.log_turn(text, "I didn't catch that. Please say yes to confirm or no to cancel.")
+            self._respond(
+                "I didn't catch that. Please say yes to confirm or no to cancel."
+            )
+            self._start_confirmation_timer()  # Reset timer for one more try
+
+        memory.log_turn(
+            text, "I didn't catch that. Please say yes to confirm or no to cancel."
+        )
 
     # ── Response output ────────────────────────────────────────────────────────
 
@@ -569,12 +628,12 @@ class MainWindow(QMainWindow):
         self._purge_audio_queue()
         if self._mic:
             self._mic.set_mute(False)
-            
+
         if sm.is_(State.SPEAKING):
             # Check for queued notifications first
             if self._pending_notifications:
                 notif = self._pending_notifications.pop(0)
-                sm.transition(State.IDLE) # briefly reset
+                sm.transition(State.IDLE)  # briefly reset
                 self._trigger_notification(notif)
                 return
 
@@ -601,17 +660,13 @@ class MainWindow(QMainWindow):
             return
 
         for item in due_items:
-            notif = {
-                "id": item.id,
-                "type": item.type,
-                "message": item.message
-            }
+            notif = {"id": item.id, "type": item.type, "message": item.message}
             if sm.is_(State.SPEAKING, State.THINKING):
                 logger.debug("Deferring notification [ID:{}]; AURA is busy.", item.id)
                 self._pending_notifications.append(notif)
             else:
                 self._trigger_notification(notif)
-            
+
             # Mark completed immediately so we don't trigger twice
             memory.mark_reminder_completed(item.id)
 
@@ -619,18 +674,19 @@ class MainWindow(QMainWindow):
         """Play sound and/or speak the reminder."""
         rtype = notif.get("type", "reminder")
         msg = notif.get("message", "something")
-        self._last_triggered_notif = notif # Track for snooze
-        
+        self._last_triggered_notif = notif  # Track for snooze
+
         sm.transition(State.SPEAKING)
-        
+
         if rtype == "alarm":
             # Play a brief beep
             import winsound
+
             Thread(target=lambda: winsound.Beep(1000, 500), daemon=True).start()
             self._tts.speak(f"Alarm ringing. It is time for your scheduled alarm.")
         else:
             self._tts.speak(f"Reminder: {msg}")
-            
+
         self._signals.aura_response.emit(f"🔔 [{rtype.upper()}] {msg}")
         logger.info("Triggered {} [ID:{}]: {}", rtype, notif.get("id"), msg)
 
@@ -660,6 +716,7 @@ class MainWindow(QMainWindow):
             logger.info("Confirmation timed out after 6 seconds.")
             # Use QMetaObject to call UI cleanup on main thread
             from PySide6.QtCore import QMetaObject, Qt
+
             QMetaObject.invokeMethod(self, "_on_confirmation_no", Qt.QueuedConnection)
 
     def _on_active_timeout(self) -> None:
@@ -711,11 +768,11 @@ class MainWindow(QMainWindow):
         # Stop active audio pipeline temporarily
         if sm.is_(State.LISTENING, State.THINKING):
             sm.transition(State.IDLE)
-        self._stack.setCurrentIndex(0)   # back to auth
+        self._stack.setCurrentIndex(0)  # back to auth
         for btn in (self._nav_console, self._nav_admin, self._nav_memory):
             btn.hide()
         # Restart camera in auth window
-        if hasattr(self._auth, '_start_camera'):
+        if hasattr(self._auth, "_start_camera"):
             self._auth._attempts = 0
             self._auth._restart_auth()
 
@@ -724,9 +781,14 @@ class MainWindow(QMainWindow):
     def _on_locked(self) -> None:
         self._cancel_timers()
         self._signals.countdown_stop.emit()
-        self.hide()   # Hide the UI to stay silent in background
-        if hasattr(self, '_tray_icon'):
-            self._tray_icon.showMessage("AURA", "AURA is running in the background. Say 'Take Control' to wake.", QSystemTrayIcon.MessageIcon.Information, 3000)
+        self.hide()  # Hide the UI to stay silent in background
+        if hasattr(self, "_tray_icon"):
+            self._tray_icon.showMessage(
+                "AURA",
+                "AURA is running in the background. Say 'Take Control' to wake.",
+                QSystemTrayIcon.MessageIcon.Information,
+                3000,
+            )
         if self._tts:
             self._tts.speak("Session locked due to inactivity.")
 
@@ -735,27 +797,27 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):  # noqa: N802
         logger.info("Initiating AURA shutdown sequence...")
         self._shutdown_flag = True
-        
+
         # 1. Stop all timers
         logger.debug("Stopping session and confirmation timers...")
         self._cancel_timers()
         self._signals.countdown_stop.emit()
-        
+
         # 2. Stop microphone stream
         if self._mic:
             logger.debug("Stopping microphone stream...")
             self._mic.stop()
-        
+
         # 3. Stop TTS engine thread
         if self._tts:
             logger.debug("Shutting down TTS engine thread...")
             self._tts.shutdown()
-        
+
         # 4. Clean up VAD consumer (flag already set)
-        
+
         # 5. Notify system
         logger.info("Publishing shutdown event...")
         bus.publish(Events.SHUTDOWN, {})
-        
+
         logger.info("AURA offline. Goodbye.")
         event.accept()

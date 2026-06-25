@@ -17,6 +17,8 @@
 
 <p align="center">
   <a href="https://github.com/Omcodesk/AURA-AI-Voice-Assistant/actions/workflows/python-app.yml"><img src="https://github.com/Omcodesk/AURA-AI-Voice-Assistant/actions/workflows/python-app.yml/badge.svg" alt="CI"></a>
+  <a href="https://codecov.io/gh/Omcodesk/AURA-AI-Voice-Assistant"><img src="https://codecov.io/gh/Omcodesk/AURA-AI-Voice-Assistant/branch/main/graph/badge.svg" alt="Codecov"></a>
+  <a href="https://github.com/Omcodesk/AURA-AI-Voice-Assistant/actions/workflows/codeql.yml"><img src="https://github.com/Omcodesk/AURA-AI-Voice-Assistant/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
   <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=flat-square&logo=python&logoColor=white">
   <img src="https://img.shields.io/badge/PySide6-Qt%20GUI-41CD52?style=flat-square&logo=qt&logoColor=white">
   <img src="https://img.shields.io/badge/Groq-Whisper%20%7C%20LLaMA-F55036?style=flat-square">

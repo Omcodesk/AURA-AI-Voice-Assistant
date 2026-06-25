@@ -15,8 +15,12 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QFrame, QSizePolicy,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QFrame,
+    QSizePolicy,
 )
 
 from core.state_machine import State
@@ -25,13 +29,13 @@ from gui.widgets.transcript_panel import TranscriptPanel
 from gui.widgets.activity_card import ActivityCard
 
 _STATE_LABELS = {
-    State.LOCKED:    "LOCKED",
-    State.IDLE:      "IDLE  —  Say \"Take Control\"",
+    State.LOCKED: "LOCKED",
+    State.IDLE: 'IDLE  —  Say "Take Control"',
     State.LISTENING: "AURA IS AT YOUR SERVICE, SIR",
-    State.THINKING:  "THINKING…",
+    State.THINKING: "THINKING…",
     State.EXECUTING: "EXECUTING…",
-    State.SPEAKING:  "SPEAKING…",
-    State.ERROR:     "ERROR",
+    State.SPEAKING: "SPEAKING…",
+    State.ERROR: "ERROR",
 }
 
 
@@ -48,7 +52,7 @@ class ConsoleWindow(QWidget):
         root.setSpacing(0)
 
         # ── State label ────────────────────────────────────────────────────
-        self._state_label = QLabel("IDLE  —  Say \"Take Control\"")
+        self._state_label = QLabel('IDLE  —  Say "Take Control"')
         self._state_label.setObjectName("state_label")
         self._state_label.setProperty("state", "IDLE")
         self._state_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -67,7 +71,9 @@ class ConsoleWindow(QWidget):
         # ── Divider ────────────────────────────────────────────────────────
         divider = QFrame()
         divider.setFrameShape(QFrame.Shape.HLine)
-        divider.setStyleSheet("color: #0D2040; background: #0D2040; max-height: 1px; margin: 12px 0;")
+        divider.setStyleSheet(
+            "color: #0D2040; background: #0D2040; max-height: 1px; margin: 12px 0;"
+        )
 
         # ── Transcript ─────────────────────────────────────────────────────
         self._transcript = TranscriptPanel()

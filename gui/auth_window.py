@@ -10,6 +10,7 @@ Auth states:
   → GRANTED (transition to console) | DENIED (retry)
   NO_USERS → show enroll prompt
 """
+
 from __future__ import annotations
 import math
 import time
@@ -21,8 +22,12 @@ import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal, Slot, QThread
 from PySide6.QtGui import QImage, QPixmap, QFont, QColor, QPainter, QPen
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QPushButton, QSizePolicy,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QSizePolicy,
 )
 from loguru import logger
 from core.config_loader import config
@@ -34,79 +39,88 @@ from auth.user_registry import registry
 
 
 class AuthState(Enum):
-    INITIALIZING  = auto()
-    NO_USERS      = auto()
-    SCANNING      = auto()
+    INITIALIZING = auto()
+    NO_USERS = auto()
+    SCANNING = auto()
     FACE_DETECTED = auto()
-    RECOGNIZING   = auto()
-    GRANTED       = auto()
-    DENIED        = auto()
-    ENROLLING     = auto()
+    RECOGNIZING = auto()
+    GRANTED = auto()
+    DENIED = auto()
+    ENROLLING = auto()
     ENROLL_CONFIRM = auto()
-    UNAVAILABLE   = auto()
+    UNAVAILABLE = auto()
 
 
 _STATE_TEXT = {
-    AuthState.INITIALIZING:  "Initialising face recognition…",
-    AuthState.NO_USERS:      "No users enrolled. Please enrol yourself to continue.",
-    AuthState.SCANNING:      "Position your face in the frame…",
+    AuthState.INITIALIZING: "Initialising face recognition…",
+    AuthState.NO_USERS: "No users enrolled. Please enrol yourself to continue.",
+    AuthState.SCANNING: "Position your face in the frame…",
     AuthState.FACE_DETECTED: "Face detected — verifying identity...",
-    AuthState.RECOGNIZING:   "Identifying…",
-    AuthState.GRANTED:       "✓  ACCESS GRANTED",
-    AuthState.DENIED:        "✗  ACCESS DENIED",
-    AuthState.ENROLLING:     "Look at the camera and hold still…",
+    AuthState.RECOGNIZING: "Identifying…",
+    AuthState.GRANTED: "✓  ACCESS GRANTED",
+    AuthState.DENIED: "✗  ACCESS DENIED",
+    AuthState.ENROLLING: "Look at the camera and hold still…",
     AuthState.ENROLL_CONFIRM: "Confirm your identity summary below.",
-    AuthState.UNAVAILABLE:   "Face auth unavailable — InsightFace not installed",
+    AuthState.UNAVAILABLE: "Face auth unavailable — InsightFace not installed",
 }
 
 _STATE_COLOR = {
-    AuthState.INITIALIZING:  "#3D5A7A",
-    AuthState.NO_USERS:      "#FF9900",
-    AuthState.SCANNING:      "#3D5A7A",
+    AuthState.INITIALIZING: "#3D5A7A",
+    AuthState.NO_USERS: "#FF9900",
+    AuthState.SCANNING: "#3D5A7A",
     AuthState.FACE_DETECTED: "#00D4FF",
-    AuthState.RECOGNIZING:   "#7B5FFF",
-    AuthState.GRANTED:       "#00FF88",
-    AuthState.DENIED:        "#FF3355",
-    AuthState.ENROLLING:     "#00D4FF",
+    AuthState.RECOGNIZING: "#7B5FFF",
+    AuthState.GRANTED: "#00FF88",
+    AuthState.DENIED: "#FF3355",
+    AuthState.ENROLLING: "#00D4FF",
     AuthState.ENROLL_CONFIRM: "#00FF88",
-    AuthState.UNAVAILABLE:   "#FF3355",
+    AuthState.UNAVAILABLE: "#FF3355",
 }
 
 
 # ── Camera QThread ────────────────────────────────────────────────────────────
 
+
 class CameraThread(QThread):
-    frame_ready = Signal(QImage, object)   # (QImage, face_object or None)
+    frame_ready = Signal(QImage, object)  # (QImage, face_object or None)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._running = True
         self.daemon = True
-        self.last_bgr: np.ndarray | None = None   # latest raw frame for recognition
+        self.last_bgr: np.ndarray | None = None  # latest raw frame for recognition
 
     def run(self):
         device_idx = config.get("camera.device_index", 0)
         backend_str = config.get("camera.backend", "default").lower()
-        
+
         backend = None
         if backend_str == "dshow":
             backend = cv2.CAP_DSHOW
         elif backend_str == "msmf":
             backend = cv2.CAP_MSMF
-            
-        logger.info("CameraThread: Initializing hardware (index={}, backend={})...", device_idx, backend_str)
+
+        logger.info(
+            "CameraThread: Initializing hardware (index={}, backend={})...",
+            device_idx,
+            backend_str,
+        )
         if backend is not None:
             cap = cv2.VideoCapture(device_idx, backend)
         else:
             cap = cv2.VideoCapture(device_idx)
-        
+
         if not cap.isOpened():
-            logger.error("CameraThread: VideoCapture failed to open (index={}, backend={}).", device_idx, backend_str)
+            logger.error(
+                "CameraThread: VideoCapture failed to open (index={}, backend={}).",
+                device_idx,
+                backend_str,
+            )
             return
-            
+
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        
+
         logger.info("CameraThread: Hardware online. Starting acquisition.")
 
         while self._running:
@@ -116,8 +130,8 @@ class CameraThread(QThread):
                 time.sleep(0.03)
                 continue
 
-            frame = cv2.flip(frame, 1)          # mirror view
-            self.last_bgr = frame.copy()         # store for recognition (no second cap needed)
+            frame = cv2.flip(frame, 1)  # mirror view
+            self.last_bgr = frame.copy()  # store for recognition (no second cap needed)
 
             # Detect face
             try:
@@ -151,13 +165,15 @@ class CameraThread(QThread):
 
 # ── Auth Window ───────────────────────────────────────────────────────────────
 
+
 class AuthWindow(QWidget):
     """
     Full face authentication screen.
     Emits `auth_success(username)` when user passes face auth.
     """
-    auth_success = Signal(str)           # username
-    enroll_requested = Signal()          # open enrollment dialog
+
+    auth_success = Signal(str)  # username
+    enroll_requested = Signal()  # open enrollment dialog
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -240,11 +256,11 @@ class AuthWindow(QWidget):
         self._save_btn = QPushButton("CONFIRM & SAVE")
         self._save_btn.setObjectName("auth_btn_save")
         self._save_btn.clicked.connect(self._on_enroll_save)
-        
+
         self._retry_btn = QPushButton("RETRY")
         self._retry_btn.setObjectName("auth_btn_retry")
         self._retry_btn.clicked.connect(self._restart_auth)
-        
+
         conf_layout.addWidget(self._retry_btn)
         conf_layout.addWidget(self._save_btn)
         self._confirm_row.hide()
@@ -296,7 +312,7 @@ class AuthWindow(QWidget):
 
     def _start_camera(self):
         self._set_state(AuthState.SCANNING)
-        self._camera = CameraThread()          # no parent — avoids Qt thread warning
+        self._camera = CameraThread()  # no parent — avoids Qt thread warning
         self._camera.frame_ready.connect(self._on_frame)
         self._camera.start()
 
@@ -311,7 +327,8 @@ class AuthWindow(QWidget):
     def _on_frame(self, qimg: QImage, face):
         # Update preview
         pix = QPixmap.fromImage(qimg).scaled(
-            self._cam_label.width(), self._cam_label.height(),
+            self._cam_label.width(),
+            self._cam_label.height(),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation,
         )
@@ -323,7 +340,9 @@ class AuthWindow(QWidget):
             if face is not None:
                 self._set_state(AuthState.FACE_DETECTED)
                 self._set_state(AuthState.RECOGNIZING)
-                Thread(target=self._run_recognition, daemon=True, name="recognition").start()
+                Thread(
+                    target=self._run_recognition, daemon=True, name="recognition"
+                ).start()
 
         elif self._state == AuthState.ENROLLING:
             # Convert QImage back to BGR numpy for embedding
@@ -335,7 +354,7 @@ class AuthWindow(QWidget):
             bgr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
             done = enroll_manager.feed_frame(bgr)
             captured, target = enroll_manager.progress
-            
+
             if not done:
                 # Show quality feedback if rejected
                 reason = enroll_manager.last_rejection
@@ -366,10 +385,19 @@ class AuthWindow(QWidget):
 
         decision = access_controller.verify(embedding)
         from PySide6.QtCore import QMetaObject, Qt, Q_ARG
+
         if decision.granted:
-            QMetaObject.invokeMethod(self, "_on_granted", Qt.QueuedConnection, Q_ARG(str, decision.username), Q_ARG(float, decision.confidence))
+            QMetaObject.invokeMethod(
+                self,
+                "_on_granted",
+                Qt.QueuedConnection,
+                Q_ARG(str, decision.username),
+                Q_ARG(float, decision.confidence),
+            )
         else:
-            QMetaObject.invokeMethod(self, "_on_denied", Qt.QueuedConnection, Q_ARG(str, decision.reason))
+            QMetaObject.invokeMethod(
+                self, "_on_denied", Qt.QueuedConnection, Q_ARG(str, decision.reason)
+            )
 
     @Slot(str, float)
     def _on_granted(self, username: str, confidence: float):
@@ -390,7 +418,9 @@ class AuthWindow(QWidget):
 
         if self._attempts >= self._max_attempts:
             self._speak("Access denied. Maximum attempts reached.")
-            self._attempt_label.setText(f"Locked after {self._max_attempts} failed attempts.")
+            self._attempt_label.setText(
+                f"Locked after {self._max_attempts} failed attempts."
+            )
             return
 
         self._speak("Access denied. Please try again.")
@@ -415,14 +445,16 @@ class AuthWindow(QWidget):
         """Called when 20 frames are captured but not yet saved."""
         self._set_state(AuthState.ENROLL_CONFIRM)
         self._stop_camera()
-        
+
         # Show the best frame captured
         if enroll_manager.best_frame_bgr is not None:
-             rgb = cv2.cvtColor(enroll_manager.best_frame_bgr, cv2.COLOR_BGR2RGB)
-             h, w, ch = rgb.shape
-             qimg = QImage(rgb.data.tobytes(), w, h, ch * w, QImage.Format.Format_RGB888)
-             pix = QPixmap.fromImage(qimg).scaled(self._cam_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
-             self._cam_label.setPixmap(pix)
+            rgb = cv2.cvtColor(enroll_manager.best_frame_bgr, cv2.COLOR_BGR2RGB)
+            h, w, ch = rgb.shape
+            qimg = QImage(rgb.data.tobytes(), w, h, ch * w, QImage.Format.Format_RGB888)
+            pix = QPixmap.fromImage(qimg).scaled(
+                self._cam_label.size(), Qt.AspectRatioMode.KeepAspectRatio
+            )
+            self._cam_label.setPixmap(pix)
 
         self._confirm_row.show()
         self._speak("Capture complete. Check your face quality and confirm to save.")
@@ -454,7 +486,7 @@ class AuthWindow(QWidget):
 
     def _set_state(self, state: AuthState):
         self._state = state
-        text  = _STATE_TEXT.get(state, "")
+        text = _STATE_TEXT.get(state, "")
         color = _STATE_COLOR.get(state, "#7B9DB5")
         self._status.setText(text)
         self._status.setStyleSheet(
@@ -479,13 +511,16 @@ class AuthWindow(QWidget):
             try:
                 import pythoncom
                 from comtypes.client import CreateObject
+
                 pythoncom.CoInitialize()
                 speaker = CreateObject("SAPI.SpVoice")
                 speaker.Rate = 2
                 speaker.Speak(text)
             except Exception as exc:
                 logger.debug("Auth TTS error: {}", exc)
+
         from threading import Thread
+
         Thread(target=_run, daemon=True, name="auth-tts").start()
 
     # ── Bypass (dev) ──────────────────────────────────────────────────────────
@@ -504,6 +539,6 @@ class AuthWindow(QWidget):
 
     def closeEvent(self, event):  # noqa: N802
         self._stop_camera()
-        if hasattr(self, '_zombie_camera') and self._zombie_camera.isRunning():
+        if hasattr(self, "_zombie_camera") and self._zombie_camera.isRunning():
             self._zombie_camera.wait(500)
         event.accept()

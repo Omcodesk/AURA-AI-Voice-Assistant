@@ -7,6 +7,7 @@ from agents.planner import planner
 from brain.core.multi_intent_parser import multi_parser
 from brain.core.confidence_guard import confidence_guard
 
+
 class IntentEngine:
     def process(self, text: str) -> list[dict]:
         """
@@ -18,12 +19,12 @@ class IntentEngine:
         """
         clean_text = normalizer.normalize(text)
         logger.info("Processing intent: '{}' (normalized: '{}')", text, clean_text)
-        
+
         # A. Try Fast Match (Deterministic - First & Fastest)
         # Skip fast matcher if sentence is complex, allowing LLM to handle STT errors and multi-actions
         words = clean_text.split()
         is_complex = len(words) > 5 or " and " in clean_text or " then " in clean_text
-        
+
         intent = None
         if not is_complex:
             intent = matcher.match(clean_text)
@@ -35,7 +36,7 @@ class IntentEngine:
                 "slots": slot_extractor.extract_slots(intent, clean_text),
                 "confidence": 1.0,
                 "needs_clarification": False,
-                "requires_confirmation": False
+                "requires_confirmation": False,
             }
         else:
             # B. Delegate to God Mode Planner (Reasoning & Multi-Step)
@@ -49,9 +50,9 @@ class IntentEngine:
                     "intent": "conversation",
                     "action": "chat",
                     "slots": {"text": clean_text},
-                    "confidence": 0.5
+                    "confidence": 0.5,
                 }
-            
+
         # C. Context Resolution (it, this, that)
         for key, val in res.get("slots", {}).items():
             if val in ("it", "this", "that"):
@@ -72,15 +73,16 @@ class IntentEngine:
 
         # E. Confidence Guard
         res = confidence_guard.evaluate(res)
-            
+
         # F. Update Context Memory
         if res.get("intent") != "conversation":
-             # Extract the most important entity for next turn
-             for s_key in ("app", "site", "url", "target", "query", "location"):
-                 if s_key in res["slots"]:
-                     context_memory.update(s_key, res["slots"][s_key])
-                     break
-        
+            # Extract the most important entity for next turn
+            for s_key in ("app", "site", "url", "target", "query", "location"):
+                if s_key in res["slots"]:
+                    context_memory.update(s_key, res["slots"][s_key])
+                    break
+
         return [res]
+
 
 engine = IntentEngine()

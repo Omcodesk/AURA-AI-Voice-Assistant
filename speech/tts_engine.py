@@ -57,10 +57,10 @@ class TTSThread(QThread):
         logger.debug("TTSThread: Shutdown requested.")
         self._running = False
         self.stop_speaking()
-        
-        self._queue.put(None)   # unblock get() and trigger loop exit
-        self.quit()             # Request Qt thread to quit
-        if not self.wait(3000): # Wait for up to 3 seconds
+
+        self._queue.put(None)  # unblock get() and trigger loop exit
+        self.quit()  # Request Qt thread to quit
+        if not self.wait(3000):  # Wait for up to 3 seconds
             logger.warning("TTSThread: Wait timed out. Forcing termination.")
             self.terminate()
             self.wait()
@@ -85,7 +85,7 @@ class TTSThread(QThread):
 
                 logger.debug("TTS speaking: '{}'", text[:80])
                 self.speech_started.emit(text)
-                
+
                 try:
                     self._interrupted = False
                     # Speak asynchronously (flag 1)
@@ -96,7 +96,7 @@ class TTSThread(QThread):
                             break
                 except Exception as exc:
                     logger.error("TTS error during Speak: {}", exc)
-                
+
                 self.speech_ended.emit()
         finally:
             self._speaker = None
@@ -131,10 +131,15 @@ class TTSThread(QThread):
 
             if selected_index is not None:
                 speaker.Voice = voices.Item(selected_index)
-                logger.info("TTS voice: '{}'", voices.Item(selected_index).GetDescription())
+                logger.info(
+                    "TTS voice: '{}'", voices.Item(selected_index).GetDescription()
+                )
             elif voices.Count > 0:
                 speaker.Voice = voices.Item(0)
-                logger.warning("No male voice found; using default: '{}'", voices.Item(0).GetDescription())
+                logger.warning(
+                    "No male voice found; using default: '{}'",
+                    voices.Item(0).GetDescription(),
+                )
             else:
                 logger.warning("No TTS voices found on this system")
         except Exception as e:

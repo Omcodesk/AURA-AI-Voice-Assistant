@@ -5,9 +5,13 @@ from auth.enroll_manager import EnrollManager, enroll_manager
 from auth.access_controller import AccessController, access_controller
 
 __all__ = [
-    "UserRegistry", "registry",
-    "FaceAnalyzer", "face_analyzer",
+    "UserRegistry",
+    "registry",
+    "FaceAnalyzer",
+    "face_analyzer",
     "LivenessChallenge",
-    "EnrollManager", "enroll_manager",
-    "AccessController", "access_controller",
+    "EnrollManager",
+    "enroll_manager",
+    "AccessController",
+    "access_controller",
 ]

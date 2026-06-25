@@ -30,12 +30,14 @@ class ConversationHandler:
 
     def __init__(self):
         self._provider = config.get("llm.provider", "groq").lower()
-        self._model    = config.get("llm.model", "llama-3.1-8b-instant")
-        self._timeout  = config.get("llm.timeout", 15)
+        self._model = config.get("llm.model", "llama-3.1-8b-instant")
+        self._timeout = config.get("llm.timeout", 15)
         self._max_hist = config.get("llm.max_history_turns", 10)
         self._history: list[dict] = []
 
-        logger.info("ConversationHandler: provider={} model={}", self._provider, self._model)
+        logger.info(
+            "ConversationHandler: provider={} model={}", self._provider, self._model
+        )
 
     # ── Public API ──────────────────────────────────────────────────────────
 
@@ -49,7 +51,9 @@ class ConversationHandler:
         elif self._provider == "ollama":
             reply = self._ollama_chat()
         else:
-            reply = f"Unknown LLM provider '{self._provider}'. Check config/settings.yaml."
+            reply = (
+                f"Unknown LLM provider '{self._provider}'. Check config/settings.yaml."
+            )
 
         self._history.append({"role": "assistant", "content": reply})
         logger.debug("LLM reply ({}): '{}'", self._provider, reply[:100])
@@ -75,6 +79,7 @@ class ConversationHandler:
     def _groq_chat(self) -> str:
         try:
             from groq import Groq
+
             client = Groq(api_key=config.groq_api_key())
             messages = [{"role": "system", "content": SYSTEM_PROMPT}] + self._history
             response = client.chat.completions.create(
@@ -94,6 +99,7 @@ class ConversationHandler:
     def _ollama_chat(self) -> str:
         try:
             import ollama
+
             messages = [{"role": "system", "content": SYSTEM_PROMPT}] + self._history
             response = ollama.chat(
                 model=self._model,
@@ -111,7 +117,7 @@ class ConversationHandler:
     # ── Helpers ─────────────────────────────────────────────────────────────
 
     def _trim_history(self) -> None:
-        max_msgs = self._max_hist * 2   # each turn = user + assistant
+        max_msgs = self._max_hist * 2  # each turn = user + assistant
         if len(self._history) > max_msgs:
             self._history = self._history[-max_msgs:]
 
@@ -123,6 +129,7 @@ class ConversationHandler:
             return "Hello. Aura at your service, though my reasoning engine is currently offline."
         if "time" in lower:
             from datetime import datetime
+
             return f"It is {datetime.now().strftime('%I:%M %p')}."
         return "I understood you, but my reasoning engine is currently unavailable."
 

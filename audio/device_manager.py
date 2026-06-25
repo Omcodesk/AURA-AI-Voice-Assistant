@@ -10,8 +10,12 @@ def get_default_input_device() -> dict:
     """Return info dict for the default input device."""
     try:
         info = sd.query_devices(kind="input")
-        logger.info("Default mic: '{}' ({} ch, {} Hz)",
-                    info["name"], info["max_input_channels"], info["default_samplerate"])
+        logger.info(
+            "Default mic: '{}' ({} ch, {} Hz)",
+            info["name"],
+            info["max_input_channels"],
+            info["default_samplerate"],
+        )
         return info
     except Exception as exc:
         logger.error("Could not query default mic: {}", exc)

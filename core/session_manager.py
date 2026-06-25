@@ -6,6 +6,7 @@ Authorization model:
   - `is_authorized` = False → session exists but protected actions (tier 2+) are blocked
   - Auto-deauthorize after inactivity; re-auth re-opens camera
 """
+
 from __future__ import annotations
 from datetime import datetime
 from threading import Timer
@@ -113,7 +114,10 @@ class SessionManager:
         self._lock_timer = None
 
     def _on_auto_lock(self) -> None:
-        logger.info("Auto-deauthorize triggered after {} min inactivity", self._auto_lock_minutes)
+        logger.info(
+            "Auto-deauthorize triggered after {} min inactivity",
+            self._auto_lock_minutes,
+        )
         self.deauthorize()
 
 

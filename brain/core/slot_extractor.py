@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from loguru import logger
 
+
 class SlotExtractor:
     def __init__(self, synonym_map_path="config/synonym_map.json"):
         self.synonyms = {}
@@ -21,17 +22,23 @@ class SlotExtractor:
         text_lower = text.lower().strip()
         # Phase 4: Strip trailing noise and punctuation
         text_lower = re.sub(r"[?!.]$", "", text_lower)
-        text_lower = re.sub(r"\s+(for me|please|now|immediately|thanks|thank you)$", "", text_lower).strip()
+        text_lower = re.sub(
+            r"\s+(for me|please|now|immediately|thanks|thank you)$", "", text_lower
+        ).strip()
         slots = {}
 
         # 1. App Extraction
         if intent in ("open_app", "close_app", "app_control"):
-            app = self._extract_after(text_lower, ["open", "launch", "start", "close", "kill", "quit"])
+            app = self._extract_after(
+                text_lower, ["open", "launch", "start", "close", "kill", "quit"]
+            )
             slots["app"] = self._canonical_app(app)
 
         # 2. Website/Site Extraction
         if intent in ("open_website", "browser_control"):
-            site = self._extract_after(text_lower, ["go to", "navigate to", "open", "on"])
+            site = self._extract_after(
+                text_lower, ["go to", "navigate to", "open", "on"]
+            )
             # Check if it's a known site name
             slots["site"] = self._canonical_site(site)
             # If site not found, maybe it's a raw URL
@@ -39,7 +46,12 @@ class SlotExtractor:
                 slots["url"] = site
 
         # 3. Search Query
-        if "search" in text_lower or intent == "search_web" or "google" in text_lower or "look up" in text_lower:
+        if (
+            "search" in text_lower
+            or intent == "search_web"
+            or "google" in text_lower
+            or "look up" in text_lower
+        ):
             # 1. Resolve search target (youtube or google)
             search_target = "google"
             if re.search(r"\bon\s+youtube\b", text_lower):
@@ -48,7 +60,9 @@ class SlotExtractor:
                 search_target = "google"
             elif re.search(r"^search\s+youtube\b", text_lower):
                 search_target = "youtube"
-            elif re.search(r"^search\s+google\b", text_lower) or re.search(r"^google\b", text_lower):
+            elif re.search(r"^search\s+google\b", text_lower) or re.search(
+                r"^google\b", text_lower
+            ):
                 search_target = "google"
             elif "youtube" in text_lower and "google" not in text_lower:
                 search_target = "youtube"
@@ -74,7 +88,7 @@ class SlotExtractor:
             strip_trailing = [
                 r"\s+on\s+(google|youtube|chrome|edge|browser|internet|safari|firefox|the\s+web|the\s+internet)$",
                 r"\s+in\s+google$",
-                r"\s+using\s+google$"
+                r"\s+using\s+google$",
             ]
             for pattern in strip_trailing:
                 query = re.sub(pattern, "", query).strip()
@@ -82,17 +96,30 @@ class SlotExtractor:
 
         # 4. Weather Location
         if intent == "weather":
-            location = self._extract_after(text_lower, ["weather in", "weather for", "weather at", "weather of"])
-            if location == text_lower: # No marker found
+            location = self._extract_after(
+                text_lower, ["weather in", "weather for", "weather at", "weather of"]
+            )
+            if location == text_lower:  # No marker found
                 location = self._extract_after(text_lower, ["weather"])
-            
+
             # Phase 4 Improved: Strip temporal fillers that aren't locations
-            location = re.sub(r"\b(right now|now|today|currently|tonight|tomorrow|right|presently)\b", "", location).strip()
+            location = re.sub(
+                r"\b(right now|now|today|currently|tonight|tomorrow|right|presently)\b",
+                "",
+                location,
+            ).strip()
             # If the result is just a filler or empty, clear it
             slots["location"] = location if len(location) > 0 else ""
 
         # 5. Brightness / Volume Amount
-        if intent in ("brightness_up", "brightness_down", "volume_up", "volume_down", "brightness_set", "volume"):
+        if intent in (
+            "brightness_up",
+            "brightness_down",
+            "volume_up",
+            "volume_down",
+            "brightness_set",
+            "volume",
+        ):
             # Try to find a percentage or number
             match = re.search(r"(\d+)", text_lower)
             if match:
@@ -104,11 +131,16 @@ class SlotExtractor:
 
         # 6. Media Control Slots
         if intent == "media_control":
-            if "play" in text_lower or "resume" in text_lower: slots["action"] = "play"
-            elif "pause" in text_lower: slots["action"] = "pause"
-            elif "next" in text_lower: slots["action"] = "next"
-            elif "prev" in text_lower or "back" in text_lower: slots["action"] = "prev"
-            elif "stop" in text_lower: slots["action"] = "stop"
+            if "play" in text_lower or "resume" in text_lower:
+                slots["action"] = "play"
+            elif "pause" in text_lower:
+                slots["action"] = "pause"
+            elif "next" in text_lower:
+                slots["action"] = "next"
+            elif "prev" in text_lower or "back" in text_lower:
+                slots["action"] = "prev"
+            elif "stop" in text_lower:
+                slots["action"] = "stop"
 
         # 7. Message/Target (WhatsApp/Email)
         if intent in ("whatsapp", "email", "send_whatsapp", "draft_email"):
@@ -153,18 +185,18 @@ class SlotExtractor:
             if match:
                 res = match.group(1).strip()
                 return res if res else ""
-        return "" # If no marker found, return empty in this context
+        return ""  # If no marker found, return empty in this context
 
     def _canonical_app(self, name: str) -> str:
         name = name.lower().strip()
         # Phase 4 improved normalization: strip fillers
         # e.g. "the browser" -> "browser", "google chrome" -> "chrome"
         name = re.sub(r"^(the|it|google|an|a)\s+", "", name).strip()
-        
+
         app_map = self.synonyms.get("apps", {})
         if name in app_map:
             return app_map[name]
-            
+
         # Check website mapping too, just in case 'open' intent got confused
         # If it's a known site, we return it as is so app_control can reroute
         if self._canonical_site(name):
@@ -178,5 +210,6 @@ class SlotExtractor:
         # Handle "youtube" vs "youtube.com"
         clean_name = name.replace(".com", "").replace(".net", "").replace(".org", "")
         return site_map.get(clean_name, "")
+
 
 slot_extractor = SlotExtractor()

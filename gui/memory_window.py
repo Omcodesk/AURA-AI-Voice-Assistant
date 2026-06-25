@@ -8,9 +8,14 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QLabel,
-    QTableWidget, QTableWidgetItem, QPushButton,
-    QScrollArea, QHeaderView,
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QTableWidget,
+    QTableWidgetItem,
+    QPushButton,
+    QScrollArea,
+    QHeaderView,
 )
 
 from brain.memory_manager import memory
@@ -29,7 +34,9 @@ class MemoryWindow(QWidget):
         root.setSpacing(12)
 
         title = QLabel("MEMORY  &  ROUTINES")
-        title.setStyleSheet("font-size: 20px; font-weight: 700; letter-spacing: 4px; color: #00D4FF;")
+        title.setStyleSheet(
+            "font-size: 20px; font-weight: 700; letter-spacing: 4px; color: #00D4FF;"
+        )
         root.addWidget(title)
 
         # ── Recent conversation ─────────────────────────────────────────────
@@ -39,7 +46,9 @@ class MemoryWindow(QWidget):
 
         self._table = QTableWidget(0, 2)
         self._table.setHorizontalHeaderLabels(["You said", "AURA replied"])
-        self._table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self._table.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.Stretch
+        )
         self._table.verticalHeader().setVisible(False)
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self._table.setStyleSheet(

@@ -8,6 +8,7 @@ Models used (downloaded automatically on first init):
 Both are bundled with opencv-contrib-python or downloaded via urllib.
 No C++ compiler required — pure Python + prebuilt wheels.
 """
+
 from __future__ import annotations
 import os
 import urllib.request
@@ -16,13 +17,16 @@ import numpy as np
 import cv2
 from loguru import logger
 
-
 # ── Model URLs ────────────────────────────────────────────────────────────────
 _MODEL_DIR = Path("models/face")
-_DET_URL  = ("https://github.com/opencv/opencv_zoo/raw/main/models/"
-              "face_detection_yunet/face_detection_yunet_2023mar.onnx")
-_REC_URL  = ("https://github.com/opencv/opencv_zoo/raw/main/models/"
-              "face_recognition_sface/face_recognition_sface_2021dec.onnx")
+_DET_URL = (
+    "https://github.com/opencv/opencv_zoo/raw/main/models/"
+    "face_detection_yunet/face_detection_yunet_2023mar.onnx"
+)
+_REC_URL = (
+    "https://github.com/opencv/opencv_zoo/raw/main/models/"
+    "face_recognition_sface/face_recognition_sface_2021dec.onnx"
+)
 _DET_FILE = _MODEL_DIR / "face_detection_yunet_2023mar.onnx"
 _REC_FILE = _MODEL_DIR / "face_recognition_sface_2021dec.onnx"
 
@@ -52,9 +56,9 @@ class FaceAnalyzer:
     def __new__(cls) -> FaceAnalyzer:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._detector  = None
+            cls._instance._detector = None
             cls._instance._recognizer = None
-            cls._instance._ready     = False
+            cls._instance._ready = False
         return cls._instance
 
     def initialize(self, model: str = "yunet_sface") -> bool:
@@ -66,7 +70,9 @@ class FaceAnalyzer:
             return False
         try:
             self._detector = cv2.FaceDetectorYN.create(
-                str(_DET_FILE), "", (640, 480),
+                str(_DET_FILE),
+                "",
+                (640, 480),
                 score_threshold=0.75,
                 nms_threshold=0.3,
                 top_k=1,
@@ -98,12 +104,16 @@ class FaceAnalyzer:
         result = []
         for face in faces:
             score = float(face[14])
-            bbox  = [int(face[0]), int(face[1]), int(face[2]), int(face[3])]
-            lmks  = face[4:14].reshape(5, 2).astype(int)
-            result.append({"bbox": bbox, "score": score, "landmarks": lmks, "_raw": face})
+            bbox = [int(face[0]), int(face[1]), int(face[2]), int(face[3])]
+            lmks = face[4:14].reshape(5, 2).astype(int)
+            result.append(
+                {"bbox": bbox, "score": score, "landmarks": lmks, "_raw": face}
+            )
         return result
 
-    def best_face(self, bgr_frame: np.ndarray, min_confidence: float = 0.75) -> dict | None:
+    def best_face(
+        self, bgr_frame: np.ndarray, min_confidence: float = 0.75
+    ) -> dict | None:
         faces = self.detect(bgr_frame)
         if not faces:
             return None
@@ -131,7 +141,9 @@ class FaceAnalyzer:
             logger.debug("Embedding error: {}", exc)
             return None
 
-    def embedding_from_frame(self, bgr_frame: np.ndarray, min_confidence: float = 0.75) -> np.ndarray | None:
+    def embedding_from_frame(
+        self, bgr_frame: np.ndarray, min_confidence: float = 0.75
+    ) -> np.ndarray | None:
         face = self.best_face(bgr_frame, min_confidence)
         if face is None:
             return None

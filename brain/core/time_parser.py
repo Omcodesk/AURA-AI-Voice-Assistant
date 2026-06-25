@@ -7,6 +7,7 @@ import re
 from datetime import datetime, timedelta
 from loguru import logger
 
+
 class TimeParser:
     def parse(self, text: str) -> datetime | None:
         """
@@ -39,10 +40,12 @@ class TimeParser:
                 hours += 12
             elif meridiem == "am" and hours == 12:
                 hours = 0
-            
+
             # Create target for today
             try:
-                target = now.replace(hour=hours, minute=minutes, second=0, microsecond=0)
+                target = now.replace(
+                    hour=hours, minute=minutes, second=0, microsecond=0
+                )
                 # If target is in the past, move to tomorrow
                 if target <= now:
                     target += timedelta(days=1)
@@ -52,5 +55,6 @@ class TimeParser:
                 return None
 
         return None
+
 
 time_parser = TimeParser()
