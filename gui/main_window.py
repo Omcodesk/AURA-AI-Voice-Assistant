@@ -14,7 +14,7 @@ from pathlib import Path
 from queue import Queue, Empty
 from threading import Thread, Timer
 
-from PySide6.QtCore import Qt, Slot, Signal, QObject
+from PySide6.QtCore import Qt, Slot, Signal, QObject, QTimer
 from PySide6.QtGui import QFont, QFontDatabase, QPalette, QColor
 from PySide6.QtWidgets import (
     QMainWindow,
