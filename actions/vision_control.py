@@ -8,7 +8,6 @@ from vision.vlm_client import vlm_client
 from loguru import logger
 
 
-@registry.register("vision", "describe_screen")
 def describe_screen(cmd: ParsedCommand) -> ExecutionResult:
     """Takes a screenshot and describes it."""
 
@@ -27,3 +26,5 @@ def describe_screen(cmd: ParsedCommand) -> ExecutionResult:
         return ExecutionResult(
             success=False, message=analysis or "I'm sorry, I couldn't see the screen."
         )
+
+registry.register("vision", "describe_screen", describe_screen)
