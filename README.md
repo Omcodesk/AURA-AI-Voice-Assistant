@@ -16,6 +16,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Omcodesk/AURA-AI-Voice-Assistant/actions/workflows/python-app.yml"><img src="https://github.com/Omcodesk/AURA-AI-Voice-Assistant/actions/workflows/python-app.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=flat-square&logo=python&logoColor=white">
   <img src="https://img.shields.io/badge/PySide6-Qt%20GUI-41CD52?style=flat-square&logo=qt&logoColor=white">
   <img src="https://img.shields.io/badge/Groq-Whisper%20%7C%20LLaMA-F55036?style=flat-square">
@@ -471,6 +472,8 @@ Contributions are welcome! 🎉
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
 4. Push to the Branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request.
+
+> **Note on CI/CD:** We use GitHub Actions for Continuous Integration. When you submit a Pull Request, our CI pipeline will automatically run `pytest` and `flake8` to ensure no code is broken. Please make sure your tests and linting pass locally before opening a PR!
 
 ---
 
