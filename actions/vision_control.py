@@ -27,4 +27,5 @@ def describe_screen(cmd: ParsedCommand) -> ExecutionResult:
             success=False, message=analysis or "I'm sorry, I couldn't see the screen."
         )
 
+
 registry.register("vision", "describe_screen", describe_screen)
