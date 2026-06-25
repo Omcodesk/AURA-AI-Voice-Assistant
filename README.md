@@ -130,6 +130,13 @@ All commands are dispatched through a **central `ActionDispatcher`** that routes
 - ⏰ Scheduled reminders and alarms are stored in the `reminder` table and polled every 30 seconds via a `QTimer`.
 - 🔗 Context memory resolves pronouns across turns ("open spotify" → "close **it**").
 
+### 🚀 Enterprise DevOps & CI/CD Pipeline
+AURA features a professional-grade DevOps setup powered by GitHub Actions:
+- **Continuous Integration (CI):** Every push to `main` automatically triggers `pytest` checks with coverage reporting via **Codecov**, ensuring code reliability.
+- **Continuous Delivery (CD):** Creating a new GitHub Release automatically triggers a **PyInstaller** workflow that compiles the app into a standalone Windows `.exe` and attaches it as a release asset.
+- **Security Scanning:** GitHub **CodeQL** runs automatically to analyze the codebase for vulnerabilities and secrets.
+- **Code Formatting:** The repository uses `pre-commit` hooks and **Black** to enforce strict Python style guidelines on every commit.
+
 ---
 
 <a id="system-architecture"></a>
